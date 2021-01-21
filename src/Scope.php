@@ -1,12 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Whisky;
 
-
 interface Scope
 {
-
     public function has(string $name): bool;
 
     /**

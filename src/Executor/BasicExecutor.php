@@ -1,12 +1,8 @@
 <?php
 
-
 namespace Whisky\Executor;
 
-
 use Whisky\Executor;
-use Whisky\Parser;
-use Whisky\Runtime;
 use Whisky\Scope;
 use Whisky\Script;
 
@@ -18,5 +14,4 @@ class BasicExecutor implements Executor
         $runTime->setScope($scope);
         $runTime->run();
     }
-
 }

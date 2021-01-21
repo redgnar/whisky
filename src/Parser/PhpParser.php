@@ -22,6 +22,7 @@ class PhpParser implements Parser
 
     public function parse(string $code): string
     {
+        /** @var array<Node> $ast */
         $ast = $this->nikicPhpParser->parse($this->prepareForParse($code));
         $traverser = new NodeTraverser();
         $visitor = new class() extends NodeVisitorAbstract {

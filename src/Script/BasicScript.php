@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Whisky\Script;
-
 
 use Whisky\Runtime;
 use Whisky\Script;

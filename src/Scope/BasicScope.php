@@ -4,6 +4,9 @@ namespace Whisky\Scope;
 
 use Whisky\Scope;
 
+/**
+ * @extends \ArrayObject<string, mixed>
+ */
 class BasicScope extends \ArrayObject implements Scope
 {
     public function has(string $name): bool
