@@ -1,0 +1,7 @@
+# https://confluence.webchili.in/pages/viewpage.action?pageId=129630212
+
+parameters:
+    checkMissingIterableValueType: false
+    excludes_analyse:
+        - tests
+        - vendor
