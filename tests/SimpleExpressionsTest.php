@@ -8,6 +8,8 @@ use Whisky\Builder;
 use Whisky\Builder\BasicBuilder;
 use Whisky\Executor;
 use Whisky\Executor\BasicExecutor;
+use Whisky\Extension\ThisNotAllowed;
+use Whisky\ParseError;
 use Whisky\Parser\PhpParser;
 use Whisky\Scope\BasicScope;
 
@@ -48,5 +50,18 @@ class SimpleExpressionsTest extends TestCase
         $script = $this->builder->build('$c = []; foreach (["a", "b", "c"] as $a) {$c[] = $a;}');
         $this->executor->execute($script, $scope);
         self::assertEquals(['a', 'b', 'c'], $scope->get('c'));
+    }
+
+    public function testNotAllowedThisUsage(): void
+    {
+        $this->expectException(ParseError::class);
+        $this->builder->addExtension(new ThisNotAllowed());
+        $this->builder->build('$this->c = $a;');
+    }
+
+    public function testParseError(): void
+    {
+        $this->expectException(ParseError::class);
+        $this->builder->build('$c = 1}');
     }
 }

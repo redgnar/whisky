@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Whisky\Builder;
 
 use Whisky\Builder;
+use Whisky\Extension;
+use Whisky\Normalizer;
 use Whisky\Parser;
 use Whisky\Script;
 use Whisky\Script\BasicScript;
@@ -12,6 +14,10 @@ use Whisky\Script\BasicScript;
 class BasicBuilder implements Builder
 {
     private Parser $parser;
+    /**
+     * @var Extension[]
+     */
+    private array $extensions = [];
 
     public function __construct(Parser $parser)
     {
@@ -20,6 +26,12 @@ class BasicBuilder implements Builder
 
     public function build(string $code): Script
     {
+        foreach ($this->extensions as $extension) {
+            $extension->parse($code);
+        }
+        foreach ($this->extensions as $extension) {
+            $code = $extension->normalize($code);
+        }
         $doScriptContent = $this->parser->parse($code);
         $className = 'Whisky_'.md5(uniqid('', true));
 
@@ -29,6 +41,12 @@ class BasicBuilder implements Builder
             $doScriptContent
         ));
     }
+
+    public function addExtension(Extension $extension): void
+    {
+        $this->extensions[] = $extension;
+    }
+
 
     protected function createScript(string $code, string $className, string $classContent): Script
     {
