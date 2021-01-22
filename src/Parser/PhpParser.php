@@ -6,11 +6,11 @@ namespace Whisky\Parser;
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
-use Whisky\ParseError;
-use Whisky\Parser\PhpParser\NodeVisitor;
 use PhpParser\Parser as NikicPhpParser;
 use PhpParser\PrettyPrinter;
+use Whisky\ParseError;
 use Whisky\Parser;
+use Whisky\Parser\PhpParser\NodeVisitor;
 
 class PhpParser implements Parser
 {

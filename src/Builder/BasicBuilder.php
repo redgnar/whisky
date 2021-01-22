@@ -6,7 +6,6 @@ namespace Whisky\Builder;
 
 use Whisky\Builder;
 use Whisky\Extension;
-use Whisky\Normalizer;
 use Whisky\Parser;
 use Whisky\Script;
 use Whisky\Script\BasicScript;
@@ -46,7 +45,6 @@ class BasicBuilder implements Builder
     {
         $this->extensions[] = $extension;
     }
-
 
     protected function createScript(string $code, string $className, string $classContent): Script
     {
