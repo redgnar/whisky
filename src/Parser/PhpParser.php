@@ -26,6 +26,7 @@ class PhpParser implements Parser
         try {
             /** @var array<Node> $ast */
             $ast = $this->nikicPhpParser->parse($this->processCodeBeforeParse($code));
+            var_export($ast);
         } catch (\PhpParser\Error $e) {
             throw new ParseError($e->getMessage());
         }
@@ -39,7 +40,8 @@ class PhpParser implements Parser
         return new ParseResult(
             $this->processCodeAfterParse($prettyPrinter->prettyPrintFile($ast)),
             $visitor->getInputVariables(),
-            $visitor->getOutputVaraibles()
+            $visitor->getOutputVaraibles(),
+            $visitor->getFunctionCalls()
         );
     }
 

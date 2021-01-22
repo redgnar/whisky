@@ -6,7 +6,9 @@ namespace Whisky\Parser\PhpParser;
 
 use PhpParser\Node;
 use PhpParser\Node\Expr\Assign;
+use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
+use PhpParser\Node\Name;
 use PhpParser\NodeVisitorAbstract;
 
 class NodeVisitor extends NodeVisitorAbstract
@@ -14,6 +16,7 @@ class NodeVisitor extends NodeVisitorAbstract
     private array $inputVariables = [];
     private array $outputVaraibles = [];
     private array $loopVariables = [];
+    private array $functionCalls = [];
     private array $assignStack = [];
     private ?Node $assignLeftSide = null;
     private ?Node $assignRightSide = null;
@@ -26,6 +29,11 @@ class NodeVisitor extends NodeVisitorAbstract
     public function getOutputVaraibles(): array
     {
         return $this->outputVaraibles;
+    }
+
+    public function getFunctionCalls(): array
+    {
+        return $this->functionCalls;
     }
 
     public function isChildOfNode(Node $node, Node $child): bool
@@ -75,6 +83,13 @@ class NodeVisitor extends NodeVisitorAbstract
                 ($this->assignRightSide === $node || $this->isChildOfNode($this->assignRightSide, $node))) {
                 $this->inputVariables[] = $node->name;
             }
+        }
+        if ($node instanceof FuncCall &&
+            $node->name instanceof Name &&
+            is_string($node->name->parts[0]) &&
+            !in_array($node->name->parts[0], $this->functionCalls, true)
+        ) {
+            $this->functionCalls[] = $node->name->parts[0];
         }
 
         return null;
