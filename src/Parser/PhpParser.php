@@ -26,7 +26,6 @@ class PhpParser implements Parser
         try {
             /** @var array<Node> $ast */
             $ast = $this->nikicPhpParser->parse($this->processCodeBeforeParse($code));
-            var_export($ast);
         } catch (\PhpParser\Error $e) {
             throw new ParseError($e->getMessage());
         }

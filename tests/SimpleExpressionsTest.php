@@ -11,6 +11,7 @@ use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
 use Whisky\ParseError;
 use Whisky\Parser\PhpParser;
+use Whisky\RunError;
 use Whisky\Scope\BasicScope;
 
 class SimpleExpressionsTest extends TestCase
@@ -40,6 +41,15 @@ class SimpleExpressionsTest extends TestCase
     {
         $scope = new BasicScope();
         $script = $this->builder->build('$b = substr("test string", 0, 5);');
+        $this->executor->execute($script, $scope);
+        self::assertEquals('test ', $scope->get('b'));
+    }
+
+    public function testFunctionCallPassArgExpression(): void
+    {
+        $scope = new BasicScope();
+        $scope->set('test', 'test string');
+        $script = $this->builder->build('$b = substr($test, 0, 5);');
         $this->executor->execute($script, $scope);
         self::assertEquals('test ', $scope->get('b'));
     }
@@ -84,5 +94,13 @@ class SimpleExpressionsTest extends TestCase
         $this->expectException(ParseError::class);
         $this->builder->addExtension(new BasicSecurity());
         $this->builder->build('$c = strval(1);');
+    }
+
+    public function testExecuteMissingVariable(): void
+    {
+        $this->expectException(RunError::class);
+        $scope = new BasicScope();
+        $script = $this->builder->build('foreach ($input as $a) {}');
+        $this->executor->execute($script, $scope);
     }
 }

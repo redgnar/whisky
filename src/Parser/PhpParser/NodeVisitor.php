@@ -65,6 +65,15 @@ class NodeVisitor extends NodeVisitorAbstract
             if ($node->valueVar instanceof Variable && is_string($node->valueVar->name)) {
                 array_unshift($this->loopVariables, $node->valueVar->name);
             }
+            // INPUT VARIABLES
+            if ($node->expr instanceof Variable && is_string($node->expr->name) && !in_array(
+                    $node->expr->name,
+                    $this->outputVaraibles,
+                    true
+                ) && !in_array($node->expr->name, $this->loopVariables, true
+                ) && !in_array($node->expr->name, $this->inputVariables, true)) {
+                $this->inputVariables[] = $node->expr->name;
+            }
         }
         if ($node instanceof Variable && is_string($node->name) && !in_array(
                 $node->name,
@@ -75,21 +84,34 @@ class NodeVisitor extends NodeVisitorAbstract
                 $this->loopVariables,
                 true
             )) {
+            // OUTPUT VARIABLES
             if ($this->assignLeftSide &&
                 ($this->assignLeftSide === $node || $this->isChildOfNode($this->assignLeftSide, $node))) {
                 $this->outputVaraibles[] = $node->name;
-            } elseif ($this->assignRightSide &&
+            } elseif ($this->assignRightSide && // INPUT VARIABLES
                 !in_array($node->name, $this->inputVariables, true) &&
                 ($this->assignRightSide === $node || $this->isChildOfNode($this->assignRightSide, $node))) {
                 $this->inputVariables[] = $node->name;
             }
         }
-        if ($node instanceof FuncCall &&
-            $node->name instanceof Name &&
-            is_string($node->name->parts[0]) &&
-            !in_array($node->name->parts[0], $this->functionCalls, true)
-        ) {
-            $this->functionCalls[] = $node->name->parts[0];
+        if ($node instanceof FuncCall) {
+            // FUNCTION CALLS
+            if ($node->name instanceof Name &&
+                is_string($node->name->parts[0]) &&
+                !in_array($node->name->parts[0], $this->functionCalls, true)) {
+                $this->functionCalls[] = $node->name->parts[0];
+            }
+            // INPUT VARIABLES
+            foreach ($node->args ?? [] as $arg) {
+                if ($arg->value instanceof Variable && is_string($arg->value->name) && !in_array(
+                        $arg->value->name,
+                        $this->outputVaraibles,
+                        true
+                    ) && !in_array($arg->value->name, $this->loopVariables, true
+                    ) && !in_array($arg->value->name, $this->inputVariables, true)) {
+                    $this->inputVariables[] = $arg->value->name;
+                }
+            }
         }
 
         return null;

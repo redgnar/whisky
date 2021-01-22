@@ -3,6 +3,7 @@
 namespace Whisky\Executor;
 
 use Whisky\Executor;
+use Whisky\RunError;
 use Whisky\Scope;
 use Whisky\Script;
 
@@ -12,6 +13,11 @@ class BasicExecutor implements Executor
     {
         $runTime = $script->getRunTime();
         $runTime->setScope($scope);
-        $runTime->run();
+        try {
+            $runTime->run();
+        } catch (\Exception $e) {
+            throw new RunError($e->getMessage());
+        }
+
     }
 }
