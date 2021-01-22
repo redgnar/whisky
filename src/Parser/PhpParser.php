@@ -21,7 +21,7 @@ class PhpParser implements Parser
         $this->nikicPhpParser = $nikicPhpParser;
     }
 
-    public function parse(string $code): string
+    public function parse(string $code): ParseResult
     {
         try {
             /** @var array<Node> $ast */
@@ -36,8 +36,8 @@ class PhpParser implements Parser
 
         $prettyPrinter = new PrettyPrinter\Standard();
 
-        return $this->processCodeAfterParse(
-            $prettyPrinter->prettyPrintFile($ast),
+        return new ParseResult(
+            $this->processCodeAfterParse($prettyPrinter->prettyPrintFile($ast)),
             $visitor->getInputVariables(),
             $visitor->getOutputVaraibles()
         );
@@ -52,24 +52,8 @@ class PhpParser implements Parser
         return $code;
     }
 
-    protected function processCodeAfterParse(string $code, array $inputVariables, array $outputVariables): string
+    protected function processCodeAfterParse(string $code): string
     {
-        $resultCode = trim(str_replace('<?php', '', $code));
-        $preCode = '';
-        if (!empty($inputVariables)) {
-            foreach ($inputVariables as $variable) {
-                $preCode .= '$'.$variable.'=$this[\''.$variable.'\'] ?? null;';
-            }
-            $resultCode = $preCode."\n".$resultCode;
-        }
-        $postCode = '';
-        if (!empty($outputVariables)) {
-            foreach ($outputVariables as $variable) {
-                $postCode .= '$this[\''.$variable.'\']=$'.$variable.';';
-            }
-            $resultCode .= "\n".$postCode;
-        }
-
-        return $resultCode;
+        return trim(str_replace('<?php', '', $code));
     }
 }

@@ -31,14 +31,26 @@ class BasicBuilder implements Builder
         foreach ($this->extensions as $extension) {
             $code = $extension->normalize($code);
         }
-        $doScriptContent = $this->parser->parse($code);
+        $parseResult = $this->parser->parse($code);
+        foreach ($this->extensions as $extension) {
+            $extension->secure($parseResult);
+        }
+
         $className = 'Whisky_'.md5(uniqid('', true));
 
-        return $this->createScript($code, $className, sprintf(
-            $this->getClassTemplate(),
+        return $this->createScript(
+            $code,
             $className,
-            $doScriptContent
-        ));
+            sprintf(
+                $this->getClassTemplate(),
+                $className,
+                $this->assignVariables(
+                    $parseResult->getParsedCode(),
+                    $parseResult->getInputVariables(),
+                    $parseResult->getOutputVariables()
+                )
+            )
+        );
     }
 
     public function addExtension(Extension $extension): void
@@ -60,5 +72,26 @@ class %s extends \Whisky\Runtime\BasicRuntime {
     }
 }
 EOD;
+    }
+
+    protected function assignVariables(string $code, array $inputVariables, array $outputVariables): string
+    {
+        $resultCode = $code;
+        $preCode = '';
+        if (!empty($inputVariables)) {
+            foreach ($inputVariables as $variable) {
+                $preCode .= '$'.$variable.'=$this[\''.$variable.'\'] ?? null;';
+            }
+            $resultCode = $preCode."\n".$resultCode;
+        }
+        $postCode = '';
+        if (!empty($outputVariables)) {
+            foreach ($outputVariables as $variable) {
+                $postCode .= '$this[\''.$variable.'\']=$'.$variable.';';
+            }
+            $resultCode .= "\n".$postCode;
+        }
+
+        return $resultCode;
     }
 }

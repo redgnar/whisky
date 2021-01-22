@@ -48,6 +48,7 @@ class SimpleExpressionsTest extends TestCase
     {
         $scope = new BasicScope();
         $script = $this->builder->build('$c = []; foreach (["a", "b", "c"] as $a) {$c[] = $a;}');
+        var_export($script);
         $this->executor->execute($script, $scope);
         self::assertEquals(['a', 'b', 'c'], $scope->get('c'));
     }

@@ -13,6 +13,7 @@ class NodeVisitor extends NodeVisitorAbstract
 {
     private array $inputVariables = [];
     private array $outputVaraibles = [];
+    private array $loopVariables = [];
     private array $assignStack = [];
     private ?Node $assignLeftSide = null;
     private ?Node $assignRightSide = null;
@@ -39,6 +40,9 @@ class NodeVisitor extends NodeVisitorAbstract
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function enterNode(Node $node)
     {
         if ($node instanceof Assign) {
@@ -46,11 +50,28 @@ class NodeVisitor extends NodeVisitorAbstract
             $this->assignLeftSide = $node->var;
             $this->assignRightSide = $node->expr;
         }
-        if ($node instanceof Variable && is_string($node->name)) {
-            if ($this->assignLeftSide && !in_array($node->name, $this->outputVaraibles, true) &&
+        if ($node instanceof Node\Stmt\Foreach_) {
+            if ($node->keyVar instanceof Variable && is_string($node->keyVar->name)) {
+                array_unshift($this->loopVariables, $node->keyVar->name);
+            }
+            if ($node->valueVar instanceof Variable && is_string($node->valueVar->name)) {
+                array_unshift($this->loopVariables, $node->valueVar->name);
+            }
+        }
+        if ($node instanceof Variable && is_string($node->name) && !in_array(
+                $node->name,
+                $this->outputVaraibles,
+                true
+            ) && !in_array(
+                $node->name,
+                $this->loopVariables,
+                true
+            )) {
+            if ($this->assignLeftSide &&
                 ($this->assignLeftSide === $node || $this->isChildOfNode($this->assignLeftSide, $node))) {
                 $this->outputVaraibles[] = $node->name;
-            } elseif ($this->assignRightSide && !in_array($node->name, $this->inputVariables, true) &&
+            } elseif ($this->assignRightSide &&
+                !in_array($node->name, $this->inputVariables, true) &&
                 ($this->assignRightSide === $node || $this->isChildOfNode($this->assignRightSide, $node))) {
                 $this->inputVariables[] = $node->name;
             }
@@ -59,6 +80,9 @@ class NodeVisitor extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function leaveNode(Node $node)
     {
         if ($node instanceof Assign) {
@@ -73,6 +97,18 @@ class NodeVisitor extends NodeVisitorAbstract
                     $this->assignLeftSide = null;
                     $this->assignRightSide = null;
                 }
+            }
+        }
+        if ($node instanceof Node\Stmt\Foreach_ && !empty($this->loopVariables)) {
+            if ($node->valueVar instanceof Variable && is_string(
+                    $node->valueVar->name
+                ) && $node->valueVar->name === $this->loopVariables[0]) {
+                array_shift($this->loopVariables);
+            }
+            if ($node->keyVar instanceof Variable && is_string(
+                    $node->keyVar->name
+                ) && $node->keyVar->name === $this->loopVariables[0]) {
+                array_shift($this->loopVariables);
             }
         }
 

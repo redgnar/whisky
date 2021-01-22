@@ -6,6 +6,7 @@ namespace Whisky\Extension;
 
 use Whisky\Extension;
 use Whisky\ParseError;
+use Whisky\Parser\ParseResult;
 
 class ThisNotAllowed implements Extension
 {
@@ -19,5 +20,9 @@ class ThisNotAllowed implements Extension
     public function normalize(string $code): string
     {
         return $code;
+    }
+
+    public function secure(ParseResult $parseResult): void
+    {
     }
 }
