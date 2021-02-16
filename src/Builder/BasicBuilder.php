@@ -26,10 +26,7 @@ class BasicBuilder implements Builder
     public function build(string $code): Script
     {
         foreach ($this->extensions as $extension) {
-            $extension->parse($code);
-        }
-        foreach ($this->extensions as $extension) {
-            $code = $extension->normalize($code);
+            $code = $extension->transformCode($code);
         }
         $parseResult = $this->parser->parse($code);
         foreach ($this->extensions as $extension) {

@@ -18,6 +18,5 @@ class BasicExecutor implements Executor
         } catch (\Exception $e) {
             throw new RunError($e->getMessage());
         }
-
     }
 }

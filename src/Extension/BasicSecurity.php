@@ -10,30 +10,19 @@ use Whisky\Parser\ParseResult;
 
 class BasicSecurity implements Extension
 {
-    public function parse(string $code): void
+    public function transformCode(string $code): string
     {
-        $notAllowedWords = ['$this', 'for', 'while', 'do', 'function', 'class', 'new'];
+        $notAllowedWords = ['$this', 'for', 'while', 'do', 'function', 'class', 'new', 'namespace', 'use', 'define', 'const'];
         foreach ($notAllowedWords as $notAllowedWord) {
-
-            if (1 === preg_match('/'.str_replace(['$'], ['\$'], $notAllowedWord).'([\W])/', $code)) {
+            if (1 === preg_match('/(^|\W)'.str_replace(['$'], ['\$'], $notAllowedWord).'($|\W)/', $code)) {
                 throw new ParseError('Using '.$notAllowedWord.' is not allowed');
             }
         }
 
-    }
-
-    public function normalize(string $code): string
-    {
         return $code;
     }
 
     public function secure(ParseResult $parseResult): void
     {
-        $allowedFunctions = ['substr'];
-        foreach ($parseResult->getFunctionCalls() as $functionName) {
-            if (!in_array($functionName, $allowedFunctions, true)) {
-                throw new ParseError('Calling '.$functionName.' function is not allowed');
-            }
-        }
     }
 }
