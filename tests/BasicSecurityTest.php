@@ -51,6 +51,18 @@ class BasicSecurityTest extends TestCase
         $this->builder->build('class A {private $a = 1;}');
     }
 
+    public function testNotAllowedDieUsage(): void
+    {
+        $this->expectException(ParseError::class);
+        $this->builder->build('$a = 1;die();');
+    }
+
+    public function testNotAllowedExitUsage(): void
+    {
+        $this->expectException(ParseError::class);
+        $this->builder->build('$a = 1;exit;');
+    }
+
     public function testOkInStringUsage(): void
     {
         $script = $this->builder->build('$a = "class";');

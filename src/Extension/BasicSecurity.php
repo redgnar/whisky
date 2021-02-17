@@ -16,6 +16,8 @@ class BasicSecurity implements Extension
         $codeWithoutStrings = preg_replace("/([\"'])(?:\\\\.|[^\\\\])*?\\1/", '""', $code);
         $notAllowedWords = [
             '$this',
+            'die',
+            'exit',
             // loops without foreach
             'for',
             'while',
@@ -23,11 +25,20 @@ class BasicSecurity implements Extension
             // definitions
             'function',
             'class',
+            'trait',
+            'abstract',
+            'public',
+            'private',
+            'protected',
             'new',
             'namespace',
             'use',
             'define',
             'const',
+            'declare',
+            'enddeclare',
+            'return',
+            'static',
             // functions
             'echo',
             'eval',
@@ -36,9 +47,21 @@ class BasicSecurity implements Extension
             'printr',
             'var_dump',
             'var_export',
+            // Constants
+            '__CLASS__',
+            '__DIR__',
+            '__FILE__',
+            '__FUNCTION__',
+            '__LINE__',
+            '__METHOD__',
+            '__NAMESPACE__',
+            '__TRAIT__',
         ];
         foreach ($notAllowedWords as $notAllowedWord) {
-            if (1 === preg_match('/(^|\W)'.str_replace(['$'], ['\$'], $notAllowedWord).'($|\W)/', $codeWithoutStrings)) {
+            if (1 === preg_match(
+                    '/(^|\W)'.str_replace(['$'], ['\$'], $notAllowedWord).'($|\W)/',
+                    $codeWithoutStrings
+                )) {
                 throw new ParseError('Using '.$notAllowedWord.' is not allowed');
             }
         }
