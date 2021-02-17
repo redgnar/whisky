@@ -23,13 +23,12 @@ class BasicSecurityTest extends TestCase
         $this->builder = new BasicBuilder(
             new PhpParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7))
         );
-
+        $this->builder->addExtension(new BasicSecurity());
         $this->executor = new BasicExecutor();
     }
 
     public function testOkUsage(): void
     {
-        $this->builder->addExtension(new BasicSecurity());
         $script = $this->builder->build('$a = 1;');
         self::assertEquals('$a = 1;', $script->getCode());
     }
@@ -37,21 +36,24 @@ class BasicSecurityTest extends TestCase
     public function testNotAllowedThisUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->addExtension(new BasicSecurity());
         $this->builder->build('$this->c = $a;');
     }
 
     public function testNotAllowedWhileUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->addExtension(new BasicSecurity());
         $this->builder->build('$c = []; $i = 0; while (true) {$c[] = $i++;}');
     }
 
     public function testNotAllowedClassUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->addExtension(new BasicSecurity());
         $this->builder->build('class A {private $a = 1;}');
+    }
+
+    public function testOkInStringUsage(): void
+    {
+        $script = $this->builder->build('$a = "class";');
+        self::assertEquals('$a = "class";', $script->getCode());
     }
 }

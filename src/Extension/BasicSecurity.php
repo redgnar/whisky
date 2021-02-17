@@ -12,6 +12,8 @@ class BasicSecurity implements Extension
 {
     public function transformCode(string $code): string
     {
+        /** @var string $codeWithoutStrings */
+        $codeWithoutStrings = preg_replace("/([\"'])(?:\\\\.|[^\\\\])*?\\1/", '""', $code);
         $notAllowedWords = [
             '$this',
             // loops without foreach
@@ -36,7 +38,7 @@ class BasicSecurity implements Extension
             'var_export',
         ];
         foreach ($notAllowedWords as $notAllowedWord) {
-            if (1 === preg_match('/(^|\W)'.str_replace(['$'], ['\$'], $notAllowedWord).'($|\W)/', $code)) {
+            if (1 === preg_match('/(^|\W)'.str_replace(['$'], ['\$'], $notAllowedWord).'($|\W)/', $codeWithoutStrings)) {
                 throw new ParseError('Using '.$notAllowedWord.' is not allowed');
             }
         }
