@@ -85,6 +85,7 @@ class BasicTokenizer implements \Whisky\Tokenizer
     public function tokenize(string $code): TokenizedCode
     {
         $tokens = [];
+        $tokenIndex = 0;
         $codeLength = mb_strlen($code);
         if (0 === $codeLength) {
             return new TokenizedCode($code, $tokens);
@@ -103,26 +104,30 @@ class BasicTokenizer implements \Whisky\Tokenizer
                 $newMode = 'SKIP';
             }
             switch ($mode) {
-                case 'SKIP':
-                    $previousCharacters = '';
-                    break;
                 case 'WORD':
                     if ('WORD' !== $newMode) {
                         $tokens[] = new Token(
                             $previousCharacters,
-                            $this->isSpecialWord($previousCharacters) ? Token::SPECIAL_WORD : Token::WORD
+                            $this->isSpecialWord($previousCharacters) ? Token::SPECIAL_WORD : Token::WORD,
+                            $tokenIndex++
                         );
                         $previousCharacters = '';
                     }
                     break;
+                case 'SPACE':
+                    if ('SPACE' !== $newMode) {
+                        $tokens[] = new Token($previousCharacters, Token::SPACE, $tokenIndex++);
+                        $previousCharacters = '';
+                    }
+                    break;
                 case 'OTHER':
-                    $tokens[] = new Token($previousCharacters, Token::OTHER);
+                    $tokens[] = new Token($previousCharacters, Token::OTHER, $tokenIndex++);
                     $previousCharacters = '';
                     break;
                 case 'S_STRING':
                     if ('S_STRING' === $newMode && '\\' !== substr($previousCharacters, -1)) {
                         $newMode = 'SKIP';
-                        $tokens[] = new Token($previousCharacters.$currentCharacter, Token::STRING);
+                        $tokens[] = new Token($previousCharacters.$currentCharacter, Token::STRING, $tokenIndex++);
                     } else {
                         $newMode = 'S_STRING';
                     }
@@ -130,10 +135,13 @@ class BasicTokenizer implements \Whisky\Tokenizer
                 case 'D_STRING':
                     if ('D_STRING' === $newMode && '\\' !== substr($previousCharacters, -1)) {
                         $newMode = 'SKIP';
-                        $tokens[] = new Token($previousCharacters.$currentCharacter, Token::STRING);
+                        $tokens[] = new Token($previousCharacters.$currentCharacter, Token::STRING, $tokenIndex++);
                     } else {
                         $newMode = 'D_STRING';
                     }
+                    break;
+                case 'SKIP':
+                    $previousCharacters = '';
                     break;
             }
             $mode = $newMode;
@@ -148,7 +156,7 @@ class BasicTokenizer implements \Whisky\Tokenizer
             return 'WORD';
         }
         if (1 === preg_match('/\s/', $character)) {
-            return 'SKIP';
+            return 'SPACE';
         }
         if (1 === preg_match('/\'/', $character)) {
             return 'S_STRING';

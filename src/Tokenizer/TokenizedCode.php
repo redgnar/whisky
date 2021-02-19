@@ -40,6 +40,21 @@ class TokenizedCode
     }
 
     /**
+     * @return Token[]
+     */
+    public function getTokensByCodeType(int $codeType): array
+    {
+        $result = [];
+        foreach ($this->tokens as $token) {
+            if ($token->getCodeType() === $codeType) {
+                $result[] = $token;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * @param Token[] $tokens
      */
     public function setTokens(array $tokens): void
@@ -51,7 +66,17 @@ class TokenizedCode
     {
         $resultCode = '';
         foreach ($this->tokens as $token) {
-            if (Token::EMPTY === $token->getCodeType()) {
+            $resultCode .= $token->getCode();
+        }
+
+        return $resultCode;
+    }
+
+    public function assembleWithoutSpace(): string
+    {
+        $resultCode = '';
+        foreach ($this->tokens as $token) {
+            if (Token::SPACE === $token->getCodeType()) {
                 continue;
             }
             $resultCode .= $token->getCode();
