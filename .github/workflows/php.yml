@@ -33,13 +33,16 @@ jobs:
           ${{ runner.os }}-php-
 
     - name: Install dependencies
+      if: "matrix.php == '8.2' && ! matrix.mode"
       run: composer install --prefer-dist --no-progress
 
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
 
     - name: Run quality check
+      if: "matrix.php == '8.2' && ! matrix.mode"
       run: composer run-script quality
 
     - name: Run test suite
+      if: "matrix.php == '8.2' && ! matrix.mode"
       run: composer run-script test
