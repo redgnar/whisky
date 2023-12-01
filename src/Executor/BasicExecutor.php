@@ -11,10 +11,8 @@ class BasicExecutor implements Executor
 {
     public function execute(Script $script, Scope $scope): void
     {
-        $runTime = $script->getRunTime();
-        $runTime->setScope($scope);
         try {
-            $runTime->run();
+            $script->getCodeRunner()($scope);
         } catch (\Exception $e) {
             throw new RunError($e->getMessage());
         }

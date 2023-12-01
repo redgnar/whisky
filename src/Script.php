@@ -8,9 +8,5 @@ interface Script
 {
     public function getCode(): string;
 
-    public function getRunTimeName(): string;
-
-    public function getRuntimeCode(): string;
-
-    public function getRunTime(): Runtime;
+    public function getCodeRunner(): \Closure;
 }
