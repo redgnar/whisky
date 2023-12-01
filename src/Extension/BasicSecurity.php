@@ -64,9 +64,9 @@ class BasicSecurity implements Extension
         ];
         foreach ($notAllowedWords as $notAllowedWord) {
             if (1 === preg_match(
-                    '/(^|\W)'.str_replace(['$'], ['\$'], $notAllowedWord).'($|\W)/',
-                    $codeWithoutStrings
-                )) {
+                '/(^|\W)'.str_replace(['$'], ['\$'], $notAllowedWord).'($|\W)/',
+                $codeWithoutStrings
+            )) {
                 throw new ParseError('Using '.$notAllowedWord.' is not allowed');
             }
         }

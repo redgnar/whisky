@@ -22,7 +22,7 @@ class SimpleExpressionsTest extends TestCase
     {
         parent::setUp();
         $this->builder = new BasicBuilder(
-            new PhpParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7))
+            new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7))
         );
 
         $this->executor = new BasicExecutor();

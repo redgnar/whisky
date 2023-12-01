@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Whisky\Parser\PhpParser;
 
 use PhpParser\Node;
+use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
@@ -13,24 +14,48 @@ use PhpParser\NodeVisitorAbstract;
 
 class NodeVisitor extends NodeVisitorAbstract
 {
+    /**
+     * @var string[]
+     */
     private array $inputVariables = [];
+    /**
+     * @var string[]
+     */
     private array $outputVaraibles = [];
+    /**
+     * @var string[]
+     */
     private array $loopVariables = [];
+    /**
+     * @var string[]
+     */
     private array $functionCalls = [];
+    /**
+     * @var Node[]
+     */
     private array $assignStack = [];
     private ?Node $assignLeftSide = null;
     private ?Node $assignRightSide = null;
 
+    /**
+     * @return string[]
+     */
     public function getInputVariables(): array
     {
         return $this->inputVariables;
     }
 
+    /**
+     * @return string[]
+     */
     public function getOutputVaraibles(): array
     {
         return $this->outputVaraibles;
     }
 
+    /**
+     * @return string[]
+     */
     public function getFunctionCalls(): array
     {
         return $this->functionCalls;
@@ -39,8 +64,8 @@ class NodeVisitor extends NodeVisitorAbstract
     public function isChildOfNode(Node $node, Node $child): bool
     {
         foreach ($node->getSubNodeNames() as $name) {
-            if ($node->{$name} instanceof Node &&
-                ($node->{$name} === $child || $this->isChildOfNode($node->{$name}, $child))) {
+            if ($node->{$name} instanceof Node
+                && ($node->{$name} === $child || $this->isChildOfNode($node->{$name}, $child))) {
                 return true;
             }
         }
@@ -48,9 +73,6 @@ class NodeVisitor extends NodeVisitorAbstract
         return false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function enterNode(Node $node)
     {
         if ($node instanceof Assign) {
@@ -67,48 +89,48 @@ class NodeVisitor extends NodeVisitorAbstract
             }
             // INPUT VARIABLES
             if ($node->expr instanceof Variable && is_string($node->expr->name) && !in_array(
-                    $node->expr->name,
-                    $this->outputVaraibles,
-                    true
-                ) && !in_array($node->expr->name, $this->loopVariables, true
-                ) && !in_array($node->expr->name, $this->inputVariables, true)) {
+                $node->expr->name,
+                $this->outputVaraibles,
+                true
+            ) && !in_array($node->expr->name, $this->loopVariables, true
+            ) && !in_array($node->expr->name, $this->inputVariables, true)) {
                 $this->inputVariables[] = $node->expr->name;
             }
         }
         if ($node instanceof Variable && is_string($node->name) && !in_array(
-                $node->name,
-                $this->outputVaraibles,
-                true
-            ) && !in_array(
-                $node->name,
-                $this->loopVariables,
-                true
-            )) {
+            $node->name,
+            $this->outputVaraibles,
+            true
+        ) && !in_array(
+            $node->name,
+            $this->loopVariables,
+            true
+        )) {
             // OUTPUT VARIABLES
-            if ($this->assignLeftSide &&
-                ($this->assignLeftSide === $node || $this->isChildOfNode($this->assignLeftSide, $node))) {
+            if ($this->assignLeftSide
+                && ($this->assignLeftSide === $node || $this->isChildOfNode($this->assignLeftSide, $node))) {
                 $this->outputVaraibles[] = $node->name;
-            } elseif ($this->assignRightSide && // INPUT VARIABLES
-                !in_array($node->name, $this->inputVariables, true) &&
-                ($this->assignRightSide === $node || $this->isChildOfNode($this->assignRightSide, $node))) {
+            } elseif ($this->assignRightSide // INPUT VARIABLES
+                && !in_array($node->name, $this->inputVariables, true)
+                && ($this->assignRightSide === $node || $this->isChildOfNode($this->assignRightSide, $node))) {
                 $this->inputVariables[] = $node->name;
             }
         }
         if ($node instanceof FuncCall) {
             // FUNCTION CALLS
-            if ($node->name instanceof Name &&
-                is_string($node->name->parts[0]) &&
-                !in_array($node->name->parts[0], $this->functionCalls, true)) {
-                $this->functionCalls[] = $node->name->parts[0];
+            if ($node->name instanceof Name
+                && is_string($node->name->getParts()[0])
+                && !in_array($node->name->getParts()[0], $this->functionCalls, true)) {
+                $this->functionCalls[] = $node->name->getParts()[0];
             }
             // INPUT VARIABLES
-            foreach ($node->args ?? [] as $arg) {
-                if ($arg->value instanceof Variable && is_string($arg->value->name) && !in_array(
-                        $arg->value->name,
-                        $this->outputVaraibles,
-                        true
-                    ) && !in_array($arg->value->name, $this->loopVariables, true
-                    ) && !in_array($arg->value->name, $this->inputVariables, true)) {
+            foreach ($node->args ?: [] as $arg) {
+                if ($arg instanceof Arg && $arg->value instanceof Variable && is_string($arg->value->name) && !in_array(
+                    $arg->value->name,
+                    $this->outputVaraibles,
+                    true
+                ) && !in_array($arg->value->name, $this->loopVariables, true
+                ) && !in_array($arg->value->name, $this->inputVariables, true)) {
                     $this->inputVariables[] = $arg->value->name;
                 }
             }
@@ -117,9 +139,6 @@ class NodeVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     public function leaveNode(Node $node)
     {
         if ($node instanceof Assign) {
@@ -138,13 +157,13 @@ class NodeVisitor extends NodeVisitorAbstract
         }
         if ($node instanceof Node\Stmt\Foreach_ && !empty($this->loopVariables)) {
             if ($node->valueVar instanceof Variable && is_string(
-                    $node->valueVar->name
-                ) && $node->valueVar->name === $this->loopVariables[0]) {
+                $node->valueVar->name
+            ) && $node->valueVar->name === $this->loopVariables[0]) {
                 array_shift($this->loopVariables);
             }
             if ($node->keyVar instanceof Variable && is_string(
-                    $node->keyVar->name
-                ) && $node->keyVar->name === $this->loopVariables[0]) {
+                $node->keyVar->name
+            ) && $node->keyVar->name === $this->loopVariables[0]) {
                 array_shift($this->loopVariables);
             }
         }

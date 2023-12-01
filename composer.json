@@ -8,14 +8,14 @@
         {"name": "Piotr Knap", "email": "piotrek.knap@gmail.com"}
     ],
     "require": {
-        "php": ">=7.4.1",
+        "php": ">=8.2",
         "nikic/php-parser": "^4.10",
         "psr/log": "^1.1"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
-        "phpstan/phpstan": "^0.12",
-        "friendsofphp/php-cs-fixer": "^2.16",
+        "phpstan/phpstan": "^1.10",
+        "friendsofphp/php-cs-fixer": "^3.14",
         "monolog/monolog": "^2.2.0"
     },
     "autoload": {
@@ -27,16 +27,12 @@
         }
     },
     "scripts": {
-        "check": [
-            "@test",
-            "@quality"
-        ],
-        "style": "php-cs-fixer fix --dry-run --diff",
-        "style-fix": "php-cs-fixer fix",
-        "quality": "phpstan analyse ./ --level max",
-        "quality-ci": "phpstan analyse ./ --level max --error-format gitlab > quality-report.json",
+        "style": "php-cs-fixer fix --config=.php-cs-fixer.dist.php -v --dry-run --stop-on-violation --using-cache=no",
+        "style-fix": "php-cs-fixer fix --config=.php-cs-fixer.dist.php",
+        "quality": "phpstan analyse -c phpstan.neon --memory-limit 1G",
+        "quality-ci": "phpstan analyse -c phpstan.neon --no-progress --memory-limit 1G",
         "test": "phpunit --colors=always",
-        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml",
-        "test-coverage-ci": "phpunit --coverage-text --colors=never"
+        "test-coverage": "phpunit --colors=always --coverage-text",
+        "test-coverage-ci": "phpunit --coverage-text --colors=never --coverage-clover phpunit_clover.xml --log-junit phpunit_report.xml"
     }
 }

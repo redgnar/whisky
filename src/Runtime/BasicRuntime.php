@@ -19,43 +19,22 @@ abstract class BasicRuntime implements Runtime
         return $this->scope;
     }
 
-    /**
-     * @param string $offset
-     *
-     * @return bool
-     */
-    public function offsetExists($offset)
+    public function offsetExists(mixed $offset): bool
     {
         return $this->scope->has($offset);
     }
 
-    /**
-     * @param string $offset
-     *
-     * @return mixed
-     */
-    public function offsetGet($offset)
+    public function offsetGet(mixed $offset): mixed
     {
         return $this->scope->get($offset);
     }
 
-    /**
-     * @param string $offset
-     * @param mixed  $value
-     *
-     * @return void
-     */
-    public function offsetSet($offset, $value)
+    public function offsetSet(mixed $offset, mixed $value): void
     {
-        $this->scope->set($offset, $value);
+        $this->scope->set($offset ?? '', $value);
     }
 
-    /**
-     * @param string $offset
-     *
-     * @return void
-     */
-    public function offsetUnset($offset)
+    public function offsetUnset(mixed $offset): void
     {
         $this->scope->unset($offset);
     }

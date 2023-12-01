@@ -6,17 +6,13 @@ namespace Whisky\Parser;
 
 class ParseResult
 {
-    private string $parsedCode;
-    private array $inputVariables;
-    private array $outputVariables;
-    private array $functionCalls;
-
-    public function __construct(string $parsedCode, array $inputVariables, array $outputVariables, array $functionCalls)
+    /**
+     * @param string[] $inputVariables
+     * @param string[] $outputVariables
+     * @param string[] $functionCalls
+     */
+    public function __construct(private string $parsedCode, private array $inputVariables, private array $outputVariables, private array $functionCalls)
     {
-        $this->parsedCode = $parsedCode;
-        $this->inputVariables = $inputVariables;
-        $this->outputVariables = $outputVariables;
-        $this->functionCalls = $functionCalls;
     }
 
     public function getParsedCode(): string
@@ -24,16 +20,25 @@ class ParseResult
         return $this->parsedCode;
     }
 
+    /**
+     * @return string[]
+     */
     public function getInputVariables(): array
     {
         return $this->inputVariables;
     }
 
+    /**
+     * @return string[]
+     */
     public function getOutputVariables(): array
     {
         return $this->outputVariables;
     }
 
+    /**
+     * @return string[]
+     */
     public function getFunctionCalls(): array
     {
         return $this->functionCalls;

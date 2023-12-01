@@ -71,6 +71,10 @@ class %s extends \Whisky\Runtime\BasicRuntime {
 EOD;
     }
 
+    /**
+     * @param array<string, mixed> $inputVariables
+     * @param array<string, mixed> $outputVariables
+     */
     protected function assignVariables(string $code, array $inputVariables, array $outputVariables): string
     {
         $resultCode = $code;

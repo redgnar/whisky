@@ -150,7 +150,7 @@ class BasicTokenizer implements \Whisky\Tokenizer
         return new TokenizedCode($code, $tokens);
     }
 
-    protected function determineMode(string $character)
+    protected function determineMode(string $character): string
     {
         if (1 === preg_match('/[\w_]/', $character)) {
             return 'WORD';

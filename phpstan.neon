@@ -1,7 +1,10 @@
-# https://confluence.webchili.in/pages/viewpage.action?pageId=129630212
+# https://confluence.webchili.in/pages/viewpage.action?pageId=142606425
 
 parameters:
-    checkMissingIterableValueType: false
-    excludes_analyse:
+    paths:
+        - src
         - tests
-        - vendor
+    excludePaths:
+        - spec
+    level: max
+

@@ -2,6 +2,7 @@
 
 namespace Whisky\Script;
 
+use Whisky\RunError;
 use Whisky\Runtime;
 use Whisky\Script;
 
@@ -43,7 +44,11 @@ class BasicScript implements Script
         if (!class_exists($runTimeName)) {
             eval($this->getRunTimeCode());
         }
+        $runTime = new $runTimeName();
+        if (!($runTime instanceof Runtime)) {
+            throw new RunError('Runtime class must implement Runtime');
+        }
 
-        return $this->runTime = new $runTimeName();
+        return $this->runTime = $runTime;
     }
 }
