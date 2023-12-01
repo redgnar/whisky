@@ -38,6 +38,9 @@ jobs:
 
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
+    - name: Run style check
+      if: "matrix.php == '8.2' && ! matrix.mode"
+      run: composer run-script style
 
     - name: Run quality check
       if: "matrix.php == '8.2' && ! matrix.mode"
