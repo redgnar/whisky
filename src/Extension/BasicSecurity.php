@@ -78,5 +78,19 @@ class BasicSecurity implements Extension
 
     public function secure(ParseResult $parseResult): void
     {
+        $notAllowedFunctionsUsed = array_intersect([
+            'file_exists',
+            'file_put_contents',
+            'file_get_contents',
+            'readfile',
+            'readlink',
+            'readdir',
+            'is_writable',
+            'is_readable',
+        ], $parseResult->getFunctionCalls());
+
+        if (!empty($notAllowedFunctionsUsed)) {
+            throw new ParseError('Using not allowed functions: '.implode(', ', $notAllowedFunctionsUsed).'');
+        }
     }
 }

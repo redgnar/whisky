@@ -68,4 +68,10 @@ class BasicSecurityTest extends TestCase
         $script = $this->builder->build('$a = "class";');
         self::assertEquals('$a = "class";', $script->getCode());
     }
+
+    public function testNotAllowedFunctionUsage(): void
+    {
+        $this->expectException(ParseError::class);
+        $this->builder->build('file_get_contents("path");');
+    }
 }
