@@ -15,6 +15,8 @@ class BasicSecurity implements Extension
         /** @var string $codeWithoutStrings */
         $codeWithoutStrings = preg_replace("/([\"'])(?:\\\\.|[^\\\\])*?\\1/", '""', $code);
         $notAllowedWords = [
+            // Function argument
+            '$scope',
             '$this',
             'die',
             'exit',
