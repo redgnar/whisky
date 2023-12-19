@@ -85,6 +85,26 @@ class SimpleExpressionsTest extends TestCase
         self::assertEquals('Test', $scope->get('c'));
     }
 
+    public function testComplexCodeExpression(): void
+    {
+        $scope = new BasicScope();
+        $this->functionProvider->addFunction('testIt', function (string $text) {return $text; });
+        $script = $this->builder->build(
+            <<<'EOD'
+    $collection = ["a", "b"];
+    $result = [];
+    foreach ($collection as $item) {
+        if ("b" === $item) {
+            continue;
+        }
+        $result[] = testIt($item);
+    }
+EOD
+            , new BasicScope());
+        $this->executor->execute($script, $scope);
+        self::assertEquals(['a'], $scope->get('result'));
+    }
+
     public function testExecuteMissingVariable(): void
     {
         $this->expectException(RunError::class);
