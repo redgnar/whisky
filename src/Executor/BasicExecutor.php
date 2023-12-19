@@ -13,7 +13,7 @@ class BasicExecutor implements Executor
     {
         try {
             $script->getCodeRunner()($scope);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             throw new RunError($e->getMessage());
         }
     }

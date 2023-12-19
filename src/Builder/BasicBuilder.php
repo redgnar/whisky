@@ -7,6 +7,7 @@ namespace Whisky\Builder;
 use Whisky\Builder;
 use Whisky\Extension;
 use Whisky\Parser;
+use Whisky\Scope;
 use Whisky\Script;
 use Whisky\Script\BasicScript;
 
@@ -23,25 +24,19 @@ class BasicBuilder implements Builder
         $this->parser = $parser;
     }
 
-    public function build(string $code): Script
+    public function build(string $code, Scope $environment): Script
     {
-        foreach ($this->extensions as $extension) {
-            $code = $extension->transformCode($code);
-        }
         $parseResult = $this->parser->parse($code);
+        $resultCode = $parseResult->getParsedCode();
         foreach ($this->extensions as $extension) {
-            $extension->secure($parseResult);
+            $resultCode = $extension->build($resultCode, $parseResult, $environment);
         }
 
         return $this->createScript(
             $code,
             eval(sprintf(
                 $this->getCodeRunnerTemplate(),
-                $this->assignVariables(
-                    $parseResult->getParsedCode(),
-                    $parseResult->getInputVariables(),
-                    $parseResult->getOutputVariables()
-                )
+                $resultCode,
             ))
         );
     }
@@ -59,34 +54,9 @@ class BasicBuilder implements Builder
     protected function getCodeRunnerTemplate(): string
     {
         return <<<'EOD'
-return function(\Whisky\Scope $scope): void {
+return function(\Whisky\Scope $scope) use($environment) : void {
 %s
 };
 EOD;
-    }
-
-    /**
-     * @param array<string, mixed> $inputVariables
-     * @param array<string, mixed> $outputVariables
-     */
-    protected function assignVariables(string $code, array $inputVariables, array $outputVariables): string
-    {
-        $resultCode = $code;
-        $preCode = '';
-        if (!empty($inputVariables)) {
-            foreach ($inputVariables as $variable) {
-                $preCode .= '$'.$variable.'=$scope->get(\''.$variable.'\');';
-            }
-            $resultCode = $preCode."\n".$resultCode;
-        }
-        $postCode = '';
-        if (!empty($outputVariables)) {
-            foreach ($outputVariables as $variable) {
-                $postCode .= '$scope->set(\''.$variable.'\', $'.$variable.');';
-            }
-            $resultCode .= "\n".$postCode;
-        }
-
-        return $resultCode;
     }
 }

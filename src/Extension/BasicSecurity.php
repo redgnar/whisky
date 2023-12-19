@@ -7,10 +7,11 @@ namespace Whisky\Extension;
 use Whisky\Extension;
 use Whisky\ParseError;
 use Whisky\Parser\ParseResult;
+use Whisky\Scope;
 
 class BasicSecurity implements Extension
 {
-    public function transformCode(string $code): string
+    public function build(string $code, ParseResult $parseResult, Scope $environment): string
     {
         /** @var string $codeWithoutStrings */
         $codeWithoutStrings = preg_replace("/([\"'])(?:\\\\.|[^\\\\])*?\\1/", '""', $code);
@@ -73,11 +74,6 @@ class BasicSecurity implements Extension
             }
         }
 
-        return $code;
-    }
-
-    public function secure(ParseResult $parseResult): void
-    {
         $notAllowedFunctionsUsed = array_intersect([
             'file_exists',
             'file_put_contents',
@@ -92,5 +88,7 @@ class BasicSecurity implements Extension
         if (!empty($notAllowedFunctionsUsed)) {
             throw new ParseError('Using not allowed functions: '.implode(', ', $notAllowedFunctionsUsed).'');
         }
+
+        return $code;
     }
 }

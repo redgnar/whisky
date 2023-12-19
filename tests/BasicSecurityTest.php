@@ -11,6 +11,7 @@ use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
 use Whisky\ParseError;
 use Whisky\Parser\PhpParser;
+use Whisky\Scope\BasicScope;
 
 class BasicSecurityTest extends TestCase
 {
@@ -29,49 +30,49 @@ class BasicSecurityTest extends TestCase
 
     public function testOkUsage(): void
     {
-        $script = $this->builder->build('$a = 1;');
+        $script = $this->builder->build('$a = 1;', new BasicScope());
         self::assertEquals('$a = 1;', $script->getCode());
     }
 
     public function testNotAllowedThisUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('$this->c = $a;');
+        $this->builder->build('$this->c = $a;', new BasicScope());
     }
 
     public function testNotAllowedWhileUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('$c = []; $i = 0; while (true) {$c[] = $i++;}');
+        $this->builder->build('$c = []; $i = 0; while (true) {$c[] = $i++;}', new BasicScope());
     }
 
     public function testNotAllowedClassUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('class A {private $a = 1;}');
+        $this->builder->build('class A {private $a = 1;}', new BasicScope());
     }
 
     public function testNotAllowedDieUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('$a = 1;die();');
+        $this->builder->build('$a = 1;die();', new BasicScope());
     }
 
     public function testNotAllowedExitUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('$a = 1;exit;');
+        $this->builder->build('$a = 1;exit;', new BasicScope());
     }
 
     public function testOkInStringUsage(): void
     {
-        $script = $this->builder->build('$a = "class";');
+        $script = $this->builder->build('$a = "class";', new BasicScope());
         self::assertEquals('$a = "class";', $script->getCode());
     }
 
     public function testNotAllowedFunctionUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('file_get_contents("path");');
+        $this->builder->build('file_get_contents("path");', new BasicScope());
     }
 }
