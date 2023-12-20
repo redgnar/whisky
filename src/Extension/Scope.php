@@ -24,22 +24,39 @@ class Scope implements Extension
      */
     protected function assignVariables(string $code, array $inputVariables, array $outputVariables): string
     {
-        $resultCode = $code;
+        $preCode = $this->buildPreCode($inputVariables);
+        $postCode = $this->buildPostCode($outputVariables);
+
+        return $preCode."\n".$code."\n".$postCode;
+    }
+
+    /**
+     * @param array<string, mixed> $inputVariables
+     */
+    private function buildPreCode(array $inputVariables): string
+    {
         $preCode = '';
         if (!empty($inputVariables)) {
             foreach ($inputVariables as $variable) {
                 $preCode .= '$'.$variable.'=$scope->get(\''.$variable.'\');';
             }
-            $resultCode = $preCode."\n".$resultCode;
         }
+
+        return $preCode;
+    }
+
+    /**
+     * @param array<string, mixed> $outputVariables
+     */
+    private function buildPostCode(array $outputVariables): string
+    {
         $postCode = '';
         if (!empty($outputVariables)) {
             foreach ($outputVariables as $variable) {
                 $postCode .= '$scope->set(\''.$variable.'\', $'.$variable.');';
             }
-            $resultCode .= "\n".$postCode;
         }
 
-        return $resultCode;
+        return $postCode;
     }
 }

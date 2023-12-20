@@ -11,7 +11,7 @@ class ParseResult
      * @param string[] $outputVariables
      * @param string[] $functionCalls
      */
-    public function __construct(private string $parsedCode, private array $inputVariables, private array $outputVariables, private array $functionCalls)
+    public function __construct(private readonly string $parsedCode, private readonly array $inputVariables, private readonly array $outputVariables, private readonly array $functionCalls)
     {
     }
 

@@ -35,6 +35,7 @@ class BasicBuilder implements Builder
 
         return $this->createScript(
             $code,
+            $resultCode,
             eval(sprintf(
                 $this->getCodeRunnerTemplate(),
                 $resultCode,
@@ -47,9 +48,9 @@ class BasicBuilder implements Builder
         $this->extensions[] = $extension;
     }
 
-    protected function createScript(string $code, \Closure $codeRunner): Script
+    protected function createScript(string $code, string $resultCode, \Closure $codeRunner): Script
     {
-        return new BasicScript($code, $codeRunner);
+        return new BasicScript($code, $resultCode, $codeRunner);
     }
 
     protected function getCodeRunnerTemplate(): string

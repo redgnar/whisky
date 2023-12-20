@@ -11,7 +11,7 @@ services:
     environment:
       - TZ=Europe/Warsaw
       - XDEBUG_MODE=off
-#      - XDEBUG_MODE=debug
+      - XDEBUG_MODE=debug
       - XDEBUG_CONFIG=client_port=9003 client_host=host.docker.internal idekey=PHPSTORM
     extra_hosts:
       - "host.docker.internal:host-gateway"
