@@ -145,9 +145,9 @@ class NodeVisitor extends NodeVisitorAbstract
             if (!empty($this->assignStack) && $this->assignStack[0] === $node) {
                 array_shift($this->assignStack);
                 if (!empty($this->assignStack)) {
-                    /** @var Assign $assignNode */
+                    /** @var Assign|Node\Stmt\Return_ $assignNode */
                     $assignNode = $this->assignStack[0];
-                    $this->assignLeftSide = $assignNode->var;
+                    $this->assignLeftSide = $assignNode->var ?? null;
                     $this->assignRightSide = $assignNode->expr;
                 } else {
                     $this->assignLeftSide = null;
@@ -158,15 +158,18 @@ class NodeVisitor extends NodeVisitorAbstract
             if (!empty($this->assignStack) && $this->assignStack[0] === $node) {
                 array_shift($this->assignStack);
                 if (!empty($this->assignStack)) {
-                    /** @var Assign $assignNode */
+                    /** @var Assign|Node\Stmt\Return_ $assignNode */
                     $assignNode = $this->assignStack[0];
-                    $this->assignLeftSide = $assignNode->var;
+                    $this->assignLeftSide = $assignNode->var ?? null;
                     $this->assignRightSide = $assignNode->expr;
                 } else {
                     $this->assignLeftSide = null;
                     $this->assignRightSide = null;
                 }
             }
+            $this->outputVaraibles[] = 'return';
+
+            return new \PhpParser\Node\Stmt\Expression(new Assign(new Variable('return'), $node->expr ?? new Node\Expr\ConstFetch(new Name('null'))));
         } elseif ($node instanceof Node\Stmt\Foreach_ && !empty($this->loopVariables)) {
             if ($node->valueVar instanceof Variable && is_string(
                 $node->valueVar->name

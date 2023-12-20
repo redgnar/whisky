@@ -73,9 +73,18 @@ class SimpleExpressionsTest extends TestCase
     {
         $scope = new BasicScope();
         $scope->set('test', 'test string');
-        $script = $this->builder->build('return $test;', new BasicScope());
+        $script = $this->builder->build('return ($test2 = $test);', new BasicScope());
         $result = $this->executor->execute($script, $scope);
-        self::assertEquals('test string', $result);
+        self::assertEquals($scope->get('test'), $result);
+        self::assertEquals($scope->get('test'), $scope->get('test2'));
+    }
+
+    public function testReturnNullExpression(): void
+    {
+        $scope = new BasicScope();
+        $script = $this->builder->build('return null;', new BasicScope());
+        $result = $this->executor->execute($script, $scope);
+        self::assertEquals(null, $result);
     }
 
     public function testForeachExpression(): void

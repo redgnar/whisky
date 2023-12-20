@@ -31,12 +31,7 @@ class BasicBuilder implements Builder
         foreach ($this->extensions as $extension) {
             $resultCode = $extension->build($resultCode, $parseResult, $environment);
         }
-        if (0 === preg_match(
-            '/(^|\W)'.str_replace(['$'], ['\$'], 'return').'($|\W)/',
-            $resultCode
-        )) {
-            $resultCode .= ' return null;';
-        }
+        $resultCode .= ' return $scope["return"] ?? null;';
 
         return $this->createScript(
             $code,
