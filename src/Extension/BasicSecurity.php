@@ -46,7 +46,7 @@ class BasicSecurity implements Extension
             'const',
             'declare',
             'enddeclare',
-            'return',
+            // 'return',
             'static',
             // functions
             'echo',

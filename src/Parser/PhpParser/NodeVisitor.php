@@ -79,8 +79,10 @@ class NodeVisitor extends NodeVisitorAbstract
             array_unshift($this->assignStack, $node);
             $this->assignLeftSide = $node->var;
             $this->assignRightSide = $node->expr;
-        }
-        if ($node instanceof Node\Stmt\Foreach_) {
+        } elseif ($node instanceof Node\Stmt\Return_) {
+            array_unshift($this->assignStack, $node);
+            $this->assignRightSide = $node->expr;
+        } elseif ($node instanceof Node\Stmt\Foreach_) {
             if ($node->keyVar instanceof Variable && is_string($node->keyVar->name)) {
                 array_unshift($this->loopVariables, $node->keyVar->name);
             }
@@ -96,8 +98,7 @@ class NodeVisitor extends NodeVisitorAbstract
             ) && !in_array($node->expr->name, $this->inputVariables, true)) {
                 $this->inputVariables[] = $node->expr->name;
             }
-        }
-        if ($node instanceof Variable && is_string($node->name) && !in_array(
+        } elseif ($node instanceof Variable && is_string($node->name) && !in_array(
             $node->name,
             $this->outputVaraibles,
             true
@@ -115,8 +116,7 @@ class NodeVisitor extends NodeVisitorAbstract
                 && ($this->assignRightSide === $node || $this->isChildOfNode($this->assignRightSide, $node))) {
                 $this->inputVariables[] = $node->name;
             }
-        }
-        if ($node instanceof FuncCall) {
+        } elseif ($node instanceof FuncCall) {
             // FUNCTION CALLS
             if ($node->name instanceof Name
                 && is_string($node->name->getParts()[0])
@@ -154,8 +154,20 @@ class NodeVisitor extends NodeVisitorAbstract
                     $this->assignRightSide = null;
                 }
             }
-        }
-        if ($node instanceof Node\Stmt\Foreach_ && !empty($this->loopVariables)) {
+        } elseif ($node instanceof Node\Stmt\Return_) {
+            if (!empty($this->assignStack) && $this->assignStack[0] === $node) {
+                array_shift($this->assignStack);
+                if (!empty($this->assignStack)) {
+                    /** @var Assign $assignNode */
+                    $assignNode = $this->assignStack[0];
+                    $this->assignLeftSide = $assignNode->var;
+                    $this->assignRightSide = $assignNode->expr;
+                } else {
+                    $this->assignLeftSide = null;
+                    $this->assignRightSide = null;
+                }
+            }
+        } elseif ($node instanceof Node\Stmt\Foreach_ && !empty($this->loopVariables)) {
             if ($node->valueVar instanceof Variable && is_string(
                 $node->valueVar->name
             ) && $node->valueVar->name === $this->loopVariables[0]) {

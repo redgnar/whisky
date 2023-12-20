@@ -69,6 +69,15 @@ class SimpleExpressionsTest extends TestCase
         self::assertEquals('test ', $scope->get('b'));
     }
 
+    public function testReturnExpression(): void
+    {
+        $scope = new BasicScope();
+        $scope->set('test', 'test string');
+        $script = $this->builder->build('return $test;', new BasicScope());
+        $result = $this->executor->execute($script, $scope);
+        self::assertEquals('test string', $result);
+    }
+
     public function testForeachExpression(): void
     {
         $scope = new BasicScope();

@@ -31,6 +31,12 @@ class BasicBuilder implements Builder
         foreach ($this->extensions as $extension) {
             $resultCode = $extension->build($resultCode, $parseResult, $environment);
         }
+        if (0 === preg_match(
+            '/(^|\W)'.str_replace(['$'], ['\$'], 'return').'($|\W)/',
+            $resultCode
+        )) {
+            $resultCode .= ' return null;';
+        }
 
         return $this->createScript(
             $code,
@@ -54,7 +60,7 @@ class BasicBuilder implements Builder
     protected function getCodeRunnerTemplate(): string
     {
         return <<<'EOD'
-return function(\Whisky\Scope $scope) use($environment) : void {
+return function(\Whisky\Scope $scope) use($environment) : mixed {
 %s
 };
 EOD;
