@@ -4,8 +4,9 @@ CHANGELOG.md merge=union
 .gitignore export-ignore
 phpunit.xml.dist export-ignore
 phpstan.neon export-ignore
-.php_cs.dist export-ignore
+.php-cs-fixer.dist export-ignore
 symfony.lock export-ignore
+docker-compose.yml export-ignore
 /tests export-ignore
 /vendor export-ignore
 .env.test
