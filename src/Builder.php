@@ -8,5 +8,5 @@ interface Builder
 {
     public function addExtension(Extension $extension): void;
 
-    public function build(string $code, Scope $functions): Script;
+    public function build(string $code, Scope $functions = null): Script;
 }

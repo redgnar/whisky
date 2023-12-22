@@ -37,75 +37,75 @@ class SimpleExpressionsTest extends TestCase
 
     public function testAssignExpression(): void
     {
-        $scope = new BasicScope();
-        $script = $this->builder->build('$a="test string";', new BasicScope());
-        $this->executor->execute($script, $scope);
-        self::assertEquals('test string', $scope->get('a'));
+        $variables = new BasicScope();
+        $script = $this->builder->build('$a="test string";');
+        $this->executor->execute($script, $variables);
+        self::assertEquals('test string', $variables->get('a'));
     }
 
     public function testFunctionCallExpression(): void
     {
-        $scope = new BasicScope();
-        $script = $this->builder->build('$b = substr("test string", 0, 5);', new BasicScope());
-        $this->executor->execute($script, $scope);
-        self::assertEquals('test ', $scope->get('b'));
+        $variables = new BasicScope();
+        $script = $this->builder->build('$b = substr("test string", 0, 5);');
+        $this->executor->execute($script, $variables);
+        self::assertEquals('test ', $variables->get('b'));
     }
 
     public function testFunctionCallFromProviderExpression(): void
     {
-        $scope = new BasicScope();
+        $variables = new BasicScope();
         $this->functionProvider->addFunction('testIt', function (string $text) {return $text; });
-        $script = $this->builder->build('$b = testIt("test string");', new BasicScope());
-        $this->executor->execute($script, $scope);
-        self::assertEquals('test string', $scope->get('b'));
+        $script = $this->builder->build('$b = testIt("test string");');
+        $this->executor->execute($script, $variables);
+        self::assertEquals('test string', $variables->get('b'));
     }
 
     public function testFunctionCallPassArgExpression(): void
     {
-        $scope = new BasicScope();
-        $scope->set('test', 'test string');
-        $script = $this->builder->build('$b = substr($test, 0, 5);', new BasicScope());
-        $this->executor->execute($script, $scope);
-        self::assertEquals('test ', $scope->get('b'));
+        $variables = new BasicScope();
+        $variables->set('test', 'test string');
+        $script = $this->builder->build('$b = substr($test, 0, 5);');
+        $this->executor->execute($script, $variables);
+        self::assertEquals('test ', $variables->get('b'));
     }
 
     public function testReturnExpression(): void
     {
-        $scope = new BasicScope();
-        $scope->set('test', 'test string');
-        $script = $this->builder->build('return ($test2 = $test);', new BasicScope());
-        $result = $this->executor->execute($script, $scope);
-        self::assertEquals($scope->get('test'), $result);
-        self::assertEquals($scope->get('test'), $scope->get('test2'));
+        $variables = new BasicScope();
+        $variables->set('test', 'test string');
+        $script = $this->builder->build('return ($test2 = $test);');
+        $result = $this->executor->execute($script, $variables);
+        self::assertEquals($variables->get('test'), $result);
+        self::assertEquals($variables->get('test'), $variables->get('test2'));
     }
 
     public function testReturnNullExpression(): void
     {
-        $scope = new BasicScope();
-        $script = $this->builder->build('return null;', new BasicScope());
-        $result = $this->executor->execute($script, $scope);
+        $variables = new BasicScope();
+        $script = $this->builder->build('return null;');
+        $result = $this->executor->execute($script, $variables);
         self::assertEquals(null, $result);
     }
 
     public function testForeachExpression(): void
     {
-        $scope = new BasicScope();
-        $script = $this->builder->build('$c = []; foreach (["a", "b", "c"] as $a) {$c[] = $a;}', new BasicScope());
-        $this->executor->execute($script, $scope);
-        self::assertEquals(['a', 'b', 'c'], $scope->get('c'));
+        $variables = new BasicScope();
+        $script = $this->builder->build('$c = []; foreach (["a", "b", "c"] as $a) {$c[] = $a;}');
+        $this->executor->execute($script, $variables);
+        self::assertEquals(['a', 'b', 'c'], $variables->get('c'));
     }
 
     public function testFunctionUsage(): void
     {
-        $scope = new BasicScope();
-        $script = $this->builder->build('$c = substr("Test Case", 0 , 4);', new BasicScope());
-        $this->executor->execute($script, $scope);
-        self::assertEquals('Test', $scope->get('c'));
+        $variables = new BasicScope();
+        $script = $this->builder->build('$c = substr("Test Case", 0 , 4);');
+        $this->executor->execute($script, $variables);
+        self::assertEquals('Test', $variables->get('c'));
     }
 
     public function testComplexCodeExpression(): void
     {
-        $scope = new BasicScope();
+        $variables = new BasicScope();
         $this->functionProvider->addFunction('testIt', function (string $text) {return $text; });
         $script = $this->builder->build(
             <<<'EOD'
@@ -118,30 +118,30 @@ class SimpleExpressionsTest extends TestCase
         $result[] = testIt($item);
     }
 EOD
-            , new BasicScope());
-        $this->executor->execute($script, $scope);
-        self::assertEquals(['a'], $scope->get('result'));
+            );
+        $this->executor->execute($script, $variables);
+        self::assertEquals(['a'], $variables->get('result'));
     }
 
     public function testExecuteMissingVariable(): void
     {
         $this->expectException(RunError::class);
-        $scope = new BasicScope();
-        $script = $this->builder->build('foreach ($input as $a) {}', new BasicScope());
-        $this->executor->execute($script, $scope);
+        $variables = new BasicScope();
+        $script = $this->builder->build('foreach ($input as $a) {}');
+        $this->executor->execute($script, $variables);
     }
 
     public function testNotExistingFunctionUsage(): void
     {
         $this->expectException(RunError::class);
-        $scope = new BasicScope();
-        $script = $this->builder->build('notExisting("path");', new BasicScope());
-        $this->executor->execute($script, $scope);
+        $variables = new BasicScope();
+        $script = $this->builder->build('notExisting("path");');
+        $this->executor->execute($script, $variables);
     }
 
     public function testParseError(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('$c = 1}', new BasicScope());
+        $this->builder->build('$c = 1}');
     }
 }

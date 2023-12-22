@@ -37,42 +37,42 @@ class BasicSecurityTest extends TestCase
     public function testNotAllowedThisUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('$this->c = $a;', new BasicScope());
+        $this->builder->build('$this->c = $a;');
     }
 
     public function testNotAllowedWhileUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('$c = []; $i = 0; while (true) {$c[] = $i++;}', new BasicScope());
+        $this->builder->build('$c = []; $i = 0; while (true) {$c[] = $i++;}');
     }
 
     public function testNotAllowedClassUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('class A {private $a = 1;}', new BasicScope());
+        $this->builder->build('class A {private $a = 1;}');
     }
 
     public function testNotAllowedDieUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('$a = 1;die();', new BasicScope());
+        $this->builder->build('$a = 1;die();');
     }
 
     public function testNotAllowedExitUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('$a = 1;exit;', new BasicScope());
+        $this->builder->build('$a = 1;exit;');
     }
 
     public function testOkInStringUsage(): void
     {
-        $script = $this->builder->build('$a = "class";', new BasicScope());
+        $script = $this->builder->build('$a = "class";');
         self::assertEquals('$a = "class";', $script->getCode());
     }
 
     public function testNotAllowedFunctionUsage(): void
     {
         $this->expectException(ParseError::class);
-        $this->builder->build('file_get_contents("path");', new BasicScope());
+        $this->builder->build('file_get_contents("path");');
     }
 }

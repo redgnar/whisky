@@ -46,7 +46,7 @@ class PhpParser implements Parser
 
     protected function processCodeBeforeParse(string $code): string
     {
-        if (false === strpos($code, '<?php ')) {
+        if (!str_contains($code, '<?php ')) {
             $code = '<?php '.$code;
         }
 
