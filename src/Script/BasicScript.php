@@ -1,24 +1,19 @@
 <?php
 
-
 namespace Whisky\Script;
-
 
 use Whisky\Runtime;
 use Whisky\Script;
 
 class BasicScript implements Script
 {
-    private string $code;
-    private string $runTimeName;
-    private string $runTimeCode;
-    private Runtime $runTime;
+    //    private Runtime $runTime;
 
-    public function __construct(string $code, string $runTimeName, string $runTimeCode)
-    {
-        $this->code = $code;
-        $this->runTimeName = $runTimeName;
-        $this->runTimeCode = $runTimeCode;
+    public function __construct(
+        private readonly string $code,
+        private readonly string $resultCode,
+        private readonly \Closure $codeRunner
+    ) {
     }
 
     public function getCode(): string
@@ -26,26 +21,13 @@ class BasicScript implements Script
         return $this->code;
     }
 
-    public function getRunTimeName(): string
+    public function getResultCode(): string
     {
-        return $this->runTimeName;
+        return $this->resultCode;
     }
 
-    public function getRunTimeCode(): string
+    public function getCodeRunner(): \Closure
     {
-        return $this->runTimeCode;
-    }
-
-    public function getRunTime(): Runtime
-    {
-        if (isset($this->runTime)) {
-            return $this->runTime;
-        }
-        $runTimeName = $this->getRunTimeName();
-        if (!class_exists($runTimeName)) {
-            eval($this->getRunTimeCode());
-        }
-
-        return $this->runTime = new $runTimeName();
+        return $this->codeRunner;
     }
 }

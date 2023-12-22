@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+
+  php:
+    container_name: whisky-php
+    restart: "no"
+    image: "gitlab.webchili.in:4567/docker-images/php-dev:8.2-fpm"
+    volumes:
+      - ./:/srv/app
+    environment:
+      - TZ=Europe/Warsaw
+      - XDEBUG_MODE=off
+      - XDEBUG_MODE=debug
+      - XDEBUG_CONFIG=client_port=9003 client_host=host.docker.internal idekey=PHPSTORM
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

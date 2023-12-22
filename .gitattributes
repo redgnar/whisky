@@ -1,0 +1,16 @@
+*.sh binary
+CHANGELOG.md merge=union
+.gitattributes export-ignore
+.gitignore export-ignore
+phpunit.xml.dist export-ignore
+phpstan.neon export-ignore
+.php-cs-fixer.dist export-ignore
+symfony.lock export-ignore
+docker-compose.yml export-ignore
+/tests export-ignore
+/vendor export-ignore
+.env.test
+.env.dist
+
+*.php text eol=lf
+*.js text eol=lf
