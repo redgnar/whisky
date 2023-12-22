@@ -22,7 +22,7 @@ class VariableHandlerTest extends TestCase
         $whiskyScope = $this->createMock(\Whisky\Scope::class);
         // Prepare
         $whiskyScope->method('get')->willReturn('value');
-        $expected = '$inputVar=$variables->get(\'inputVar\');'."\n".
+        $expected = '$inputVar=$variables->get(\'inputVar\');if($variables->has(\'outputVar\'))$outputVar=$variables->get(\'outputVar\');'."\n".
             'parsedCode'."\n".
             '$variables->set(\'outputVar\', $outputVar);';
 

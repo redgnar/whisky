@@ -11,9 +11,7 @@ use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
 use Whisky\Extension\FunctionProvider;
 use Whisky\Extension\VariableHandler;
-use Whisky\ParseError;
 use Whisky\Parser\PhpParser;
-use Whisky\RunError;
 use Whisky\Scope\BasicScope;
 
 class ComplexExpressionsTest extends TestCase
@@ -37,21 +35,36 @@ class ComplexExpressionsTest extends TestCase
 
     public function testComplexCodeExpression(): void
     {
-        $variables = new BasicScope();
+        $variables = new BasicScope(['collection' => ['a', 'b']]);
         $this->functionProvider->addFunction('testIt', function (string $text) {return $text; });
         $script = $this->builder->build(
             <<<'EOD'
-    $collection = ["a", "b"];
     $result = [];
     foreach ($collection as $item) {
         if ("b" === $item) {
             continue;
         }
-        $result[] = testIt($item);
+        $result[] = testIt($item."aaa4bbb");
     }
 EOD
         );
         $this->executor->execute($script, $variables);
-        self::assertEquals(['a'], $variables->get('result'));
+        self::assertEquals(['aaaa4bbb'], $variables->get('result'));
+    }
+
+    public function testComplexCodeExpression2(): void
+    {
+        $variables = new BasicScope(['a' => new \stdClass()]);
+        $script = $this->builder->build(
+            <<<'EOD'
+            $a->value = "test1";
+            $a->value2 = "test2";
+            $a->value3 = "test3";
+EOD
+        );
+        $this->executor->execute($script, $variables);
+        $a = $variables->get('a');
+        self::assertIsObject($a);
+        self::assertEquals('test3', $a->value3 ?? '');
     }
 }

@@ -35,7 +35,7 @@ class VariableHandler implements Extension
      */
     protected function assignVariables(string $code, array $inputVariables, array $outputVariables): string
     {
-        $preCode = $this->buildPreCode($inputVariables);
+        $preCode = $this->buildPreCode($inputVariables, $outputVariables);
         $postCode = $this->buildPostCode($outputVariables);
 
         return $preCode."\n".$code."\n".$postCode;
@@ -43,13 +43,19 @@ class VariableHandler implements Extension
 
     /**
      * @param array<string, mixed> $inputVariables
+     * @param array<string, mixed> $outputVariables
      */
-    private function buildPreCode(array $inputVariables): string
+    private function buildPreCode(array $inputVariables, array $outputVariables): string
     {
         $preCode = '';
         if (!empty($inputVariables)) {
             foreach ($inputVariables as $variable) {
                 $preCode .= '$'.$variable.'=$variables->get(\''.$variable.'\');';
+            }
+        }
+        if (!empty($outputVariables)) {
+            foreach ($outputVariables as $variable) {
+                $preCode .= 'if($variables->has(\''.$variable.'\'))$'.$variable.'=$variables->get(\''.$variable.'\');';
             }
         }
 
