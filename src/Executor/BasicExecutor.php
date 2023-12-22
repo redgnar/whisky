@@ -14,7 +14,11 @@ class BasicExecutor implements Executor
         try {
             return $script->getCodeRunner()($variables);
         } catch (\Throwable $e) {
-            throw new RunError($e->getMessage());
+            $message = $e->getMessage();
+            if (str_contains($message, 'Undefined array key')) {
+                $message = str_replace('Undefined array key', 'Undefined variable', $message);
+            }
+            throw new RunError($message, $e->getCode(), $e);
         }
     }
 }

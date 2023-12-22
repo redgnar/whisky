@@ -2,17 +2,37 @@
 
 namespace Whisky\Test\Extension;
 
+use PhpParser\ParserFactory;
 use PHPUnit\Framework\TestCase;
+use Whisky\Builder;
+use Whisky\Builder\BasicBuilder;
+use Whisky\Executor;
+use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
 use Whisky\ParseError;
 use Whisky\Parser\ParseResult;
+use Whisky\Parser\PhpParser;
 use Whisky\Scope;
+use Whisky\Scope\BasicScope;
 
 /**
  * Class BasicSecurityTest - it tests functionality of the BasicSecurity class.
  */
 class BasicSecurityTest extends TestCase
 {
+    protected Builder $builder;
+    protected Executor $executor;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->builder = new BasicBuilder(
+            new PhpParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7))
+        );
+        $this->builder->addExtension(new BasicSecurity());
+        $this->executor = new BasicExecutor();
+    }
+
     public function testBuildMethod(): void
     {
         $basicSec = new BasicSecurity();
@@ -29,5 +49,53 @@ class BasicSecurityTest extends TestCase
         $withBannedWords = 'die("this should not pass");';
         $this->expectException(ParseError::class);
         $basicSec->build($withBannedWords, $parseResultMock, $scopeMock);
+    }
+
+    public function testOkUsage(): void
+    {
+        $script = $this->builder->build('$a = 1;', new BasicScope());
+        self::assertEquals('$a = 1;', $script->getCode());
+    }
+
+    public function testNotAllowedThisUsage(): void
+    {
+        $this->expectException(ParseError::class);
+        $this->builder->build('$this->c = $a;');
+    }
+
+    public function testNotAllowedWhileUsage(): void
+    {
+        $this->expectException(ParseError::class);
+        $this->builder->build('$c = []; $i = 0; while (true) {$c[] = $i++;}');
+    }
+
+    public function testNotAllowedClassUsage(): void
+    {
+        $this->expectException(ParseError::class);
+        $this->builder->build('class A {private $a = 1;}');
+    }
+
+    public function testClassInStringUsage(): void
+    {
+        $script = $this->builder->build('$a = "class";');
+        self::assertEquals('$a = "class";', $script->getCode());
+    }
+
+    public function testNotAllowedDieUsage(): void
+    {
+        $this->expectException(ParseError::class);
+        $this->builder->build('$a = 1;die();');
+    }
+
+    public function testNotAllowedExitUsage(): void
+    {
+        $this->expectException(ParseError::class);
+        $this->builder->build('$a = 1;exit;');
+    }
+
+    public function testNotAllowedFunctionUsage(): void
+    {
+        $this->expectException(ParseError::class);
+        $this->builder->build('file_get_contents("path");');
     }
 }
