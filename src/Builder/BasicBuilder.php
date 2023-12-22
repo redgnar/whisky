@@ -24,14 +24,15 @@ class BasicBuilder implements Builder
         $this->parser = $parser;
     }
 
-    public function build(string $code, Scope $environment): Script
+    public function build(string $code, Scope $functions = null): Script
     {
+        $functions ??= new Scope\BasicScope();
         $parseResult = $this->parser->parse($code);
         $resultCode = $parseResult->getParsedCode();
         foreach ($this->extensions as $extension) {
-            $resultCode = $extension->build($resultCode, $parseResult, $environment);
+            $resultCode = $extension->build($resultCode, $parseResult, $functions);
         }
-        $resultCode .= ' return $scope["return"] ?? null;';
+        $resultCode .= ' return $variables["return"] ?? null;';
 
         return $this->createScript(
             $code,
@@ -56,7 +57,7 @@ class BasicBuilder implements Builder
     protected function getCodeRunnerTemplate(): string
     {
         return <<<'EOD'
-return function(\Whisky\Scope $scope) use($environment) : mixed {
+return function(\Whisky\Scope $variables) use($functions) : mixed {
 %s
 };
 EOD;

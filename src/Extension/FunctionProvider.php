@@ -10,18 +10,29 @@ use Whisky\Scope;
 
 class FunctionProvider implements Extension
 {
+    use NotAllowedWord;
+
+    private const NOT_ALLOWED_WORDS = [
+        '$functions',
+    ];
+
     /**
      * @var array<string,\Closure>
      */
     private array $functionRegistry = [];
 
-    public function build(string $code, ParseResult $parseResult, Scope $environment): string
+    public function build(string $code, ParseResult $parseResult, Scope $functions): string
     {
+        $codeWithoutStrings = $this->clearCodeFromStrings($code);
+        foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
+            $this->isWordAllowed($notAllowedWord, $codeWithoutStrings);
+        }
+
         foreach ($parseResult->getFunctionCalls() as $functionName) {
             if (!function_exists($functionName)) {
                 if ($this->hasFunction($functionName)) {
-                    $environment->set($functionName, $this->getFunction($functionName));
-                    $code = preg_replace('/(^|\W)'.str_replace(['$'], ['\$'], $functionName).'($|\W)/', '${1}$environment[\''.$functionName.'\']${2}', $code) ?? '';
+                    $functions->set($functionName, $this->getFunction($functionName));
+                    $code = preg_replace('/(^|\W)'.str_replace(['$'], ['\$'], $functionName).'($|\W)/', '${1}$functions[\''.$functionName.'\']${2}', $code) ?? '';
                 }
             }
         }

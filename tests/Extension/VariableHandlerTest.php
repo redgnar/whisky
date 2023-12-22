@@ -3,17 +3,17 @@
 namespace Whisky\Test\Extension;
 
 use PHPUnit\Framework\TestCase;
-use Whisky\Extension\Scope;
+use Whisky\Extension\VariableHandler;
 use Whisky\Parser\ParseResult;
 use Whisky\Scope as WhiskyScope;
 
-class ScopeTest extends TestCase
+class VariableHandlerTest extends TestCase
 {
-    private Scope $scope;
+    private VariableHandler $scope;
 
     protected function setUp(): void
     {
-        $this->scope = new Scope();
+        $this->scope = new VariableHandler();
     }
 
     public function testBuild(): void
@@ -22,9 +22,9 @@ class ScopeTest extends TestCase
         $whiskyScope = $this->createMock(\Whisky\Scope::class);
         // Prepare
         $whiskyScope->method('get')->willReturn('value');
-        $expected = '$inputVar=$scope->get(\'inputVar\');'."\n".
+        $expected = '$inputVar=$variables->get(\'inputVar\');'."\n".
             'parsedCode'."\n".
-            '$scope->set(\'outputVar\', $outputVar);';
+            '$variables->set(\'outputVar\', $outputVar);';
 
         // Act
         $actual = $this->scope->build('parsedCode', $parseResult, $whiskyScope);

@@ -11,8 +11,10 @@ use Whisky\Scope;
 
 class BasicSecurity implements Extension
 {
+    use NotAllowedWord;
+
     private const NOT_ALLOWED_WORDS = [
-        '$environment', '$scope', '$this', 'die', 'exit', 'for', 'while', 'do',
+        '$this', 'die', 'exit', 'for', 'while', 'do',
         'function', 'class', 'trait', 'abstract', 'include', 'include_once',
         'require', 'require_once', 'interface', 'public', 'private', 'protected',
         'new', 'namespace', 'use', 'define', 'const', 'declare', 'enddeclare',
@@ -26,9 +28,9 @@ class BasicSecurity implements Extension
         'readlink', 'readdir', 'is_writable', 'is_readable',
     ];
 
-    public function build(string $code, ParseResult $parseResult, Scope $environment): string
+    public function build(string $code, ParseResult $parseResult, Scope $functions): string
     {
-        $codeWithoutStrings = preg_replace("/([\"'])(?:\\\\.|[^\\\\])*?\\1/", '""', $code) ?: '';
+        $codeWithoutStrings = $this->clearCodeFromStrings($code);
         foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
             $this->isWordAllowed($notAllowedWord, $codeWithoutStrings);
         }
@@ -39,25 +41,5 @@ class BasicSecurity implements Extension
         }
 
         return $code;
-    }
-
-    private function isWordAllowed(string $word, string $codeWithoutStrings): void
-    {
-        if (1 === preg_match('/(^|\W)'.str_replace(['$'], ['\$'], $word).'($|\W)/', $codeWithoutStrings)) {
-            throw new ParseError($this->getNotAllowedWordErrorMessage($word));
-        }
-    }
-
-    private function getNotAllowedWordErrorMessage(string $word): string
-    {
-        return 'Using '.$word.' is not allowed';
-    }
-
-    /**
-     * @param string[] $functions
-     */
-    private function getNotAllowedFunctionsErrorMessage(array $functions): string
-    {
-        return 'Using not allowed functions: '.implode(', ', $functions);
     }
 }

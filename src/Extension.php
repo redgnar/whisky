@@ -8,5 +8,5 @@ use Whisky\Parser\ParseResult;
 
 interface Extension
 {
-    public function build(string $code, ParseResult $parseResult, Scope $environment): string;
+    public function build(string $code, ParseResult $parseResult, Scope $functions): string;
 }

@@ -9,10 +9,10 @@ use Whisky\Script;
 
 class BasicExecutor implements Executor
 {
-    public function execute(Script $script, Scope $scope): mixed
+    public function execute(Script $script, Scope $variables): mixed
     {
         try {
-            return $script->getCodeRunner()($scope);
+            return $script->getCodeRunner()($variables);
         } catch (\Throwable $e) {
             throw new RunError($e->getMessage());
         }

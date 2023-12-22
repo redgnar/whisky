@@ -7,10 +7,21 @@ namespace Whisky\Extension;
 use Whisky\Extension;
 use Whisky\Parser\ParseResult;
 
-class Scope implements Extension
+class VariableHandler implements Extension
 {
-    public function build(string $code, ParseResult $parseResult, \Whisky\Scope $environment): string
+    use NotAllowedWord;
+
+    private const NOT_ALLOWED_WORDS = [
+        '$variables',
+    ];
+
+    public function build(string $code, ParseResult $parseResult, \Whisky\Scope $functions): string
     {
+        $codeWithoutStrings = $this->clearCodeFromStrings($code);
+        foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
+            $this->isWordAllowed($notAllowedWord, $codeWithoutStrings);
+        }
+
         return $this->assignVariables(
             $code,
             $parseResult->getInputVariables(),
@@ -38,7 +49,7 @@ class Scope implements Extension
         $preCode = '';
         if (!empty($inputVariables)) {
             foreach ($inputVariables as $variable) {
-                $preCode .= '$'.$variable.'=$scope->get(\''.$variable.'\');';
+                $preCode .= '$'.$variable.'=$variables->get(\''.$variable.'\');';
             }
         }
 
@@ -53,7 +64,7 @@ class Scope implements Extension
         $postCode = '';
         if (!empty($outputVariables)) {
             foreach ($outputVariables as $variable) {
-                $postCode .= '$scope->set(\''.$variable.'\', $'.$variable.');';
+                $postCode .= '$variables->set(\''.$variable.'\', $'.$variable.');';
             }
         }
 

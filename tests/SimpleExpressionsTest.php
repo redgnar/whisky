@@ -10,7 +10,7 @@ use Whisky\Executor;
 use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
 use Whisky\Extension\FunctionProvider;
-use Whisky\Extension\Scope;
+use Whisky\Extension\VariableHandler;
 use Whisky\ParseError;
 use Whisky\Parser\PhpParser;
 use Whisky\RunError;
@@ -30,7 +30,7 @@ class SimpleExpressionsTest extends TestCase
             new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7))
         );
         $this->builder->addExtension(new BasicSecurity());
-        $this->builder->addExtension(new Scope());
+        $this->builder->addExtension(new VariableHandler());
         $this->builder->addExtension($this->functionProvider);
         $this->executor = new BasicExecutor();
     }

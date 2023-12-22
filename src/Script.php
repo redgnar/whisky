@@ -8,5 +8,7 @@ interface Script
 {
     public function getCode(): string;
 
+    public function getResultCode(): string;
+
     public function getCodeRunner(): \Closure;
 }
