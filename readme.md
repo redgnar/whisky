@@ -47,10 +47,6 @@ $this->executor->execute($script, $variables);
 var_dump($variables->get('result'));
 ```
 
-## Contributing
-
-We welcome contributions from the community. Please read our [CONTRIBUTING.md](./CONTRIBUTING.md) (link to your contribution guidelines) for details on how to contribute to this project.
-
 ## License
 
 This library is released under an open-source license. For more information, please see the [LICENSE](./LICENSE) file in the repository.
