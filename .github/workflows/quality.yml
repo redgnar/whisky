@@ -1,16 +1,16 @@
-name: PHP Composer
+name: Quality
 
 on:
   push:
-    branches: [ master ]
+    branches: [ 1.0 ]
   pull_request:
-    branches: [ master ]
+    branches: [ 1.0 ]
 
 jobs:
   build:
 
     runs-on: ubuntu-20.04
-    name: Build and test
+    name: Quality & Test
     strategy:
       fail-fast: false
       matrix:
