@@ -1,6 +1,8 @@
 # redgnar/whisky
 
+[![Latest](https://img.shields.io/packagist/v/redgnar/whisky.svg?style=flat-square)](https://packagist.org/packages/redgnar/whisky)
 [![Quality](https://github.com/redgnar/whisky/actions/workflows/quality.yml/badge.svg?branch=1.0)](https://github.com/redgnar/whisky/actions/workflows/quality.yml)
+[![Downloads](https://img.shields.io/packagist/dt/redgnar/whisky.svg?style=flat-square)](https://packagist.org/packages/redgnar/whisky)
 
 The Whisky The library is designed for the safe execution of PHP scripts, with the ability to set input variables and read output variables. The library allows for defining custom functions as well as security rules.
 
