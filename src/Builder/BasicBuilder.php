@@ -7,6 +7,7 @@ namespace Whisky\Builder;
 use Whisky\Builder;
 use Whisky\Extension;
 use Whisky\Parser;
+use Whisky\Parser\ParseResult;
 use Whisky\Scope;
 use Whisky\Script;
 use Whisky\Script\BasicScript;
@@ -27,16 +28,21 @@ class BasicBuilder implements Builder
     public function build(string $code, Scope $functions = null): Script
     {
         $functions ??= new Scope\BasicScope();
-        $parseResult = $this->parser->parse($code);
+        $resultCode = $code;
+        foreach ($this->extensions as $extension) {
+            $resultCode = $extension->parse($resultCode, $functions);
+        }
+        $parseResult = $this->parser->parse($resultCode);
         $resultCode = $parseResult->getParsedCode();
         foreach ($this->extensions as $extension) {
             $resultCode = $extension->build($resultCode, $parseResult, $functions);
         }
-        $resultCode .= ' return $variables["return"] ?? null;';
+        $resultCode .= ' return $return ?? null;';
 
         return $this->createScript(
             $code,
             $resultCode,
+            $parseResult,
             eval(sprintf(
                 $this->getCodeRunnerTemplate(),
                 $resultCode,
@@ -49,9 +55,9 @@ class BasicBuilder implements Builder
         $this->extensions[] = $extension;
     }
 
-    protected function createScript(string $code, string $resultCode, \Closure $codeRunner): Script
+    protected function createScript(string $code, string $resultCode, ParseResult $parseResult, \Closure $codeRunner): Script
     {
-        return new BasicScript($code, $resultCode, $codeRunner);
+        return new BasicScript($code, $resultCode, $parseResult, $codeRunner);
     }
 
     protected function getCodeRunnerTemplate(): string

@@ -6,6 +6,7 @@ namespace Whisky\Extension;
 
 use Whisky\Extension;
 use Whisky\Parser\ParseResult;
+use Whisky\Scope;
 
 class VariableHandler implements Extension
 {
@@ -15,13 +16,18 @@ class VariableHandler implements Extension
         '$variables',
     ];
 
-    public function build(string $code, ParseResult $parseResult, \Whisky\Scope $functions): string
+    public function parse(string $code, Scope $functions): string
     {
         $codeWithoutStrings = $this->clearCodeFromStrings($code);
         foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
             $this->isWordAllowed($notAllowedWord, $codeWithoutStrings);
         }
 
+        return $code;
+    }
+
+    public function build(string $code, ParseResult $parseResult, Scope $functions): string
+    {
         return $this->assignVariables(
             $code,
             $parseResult->getInputVariables(),

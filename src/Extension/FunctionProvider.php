@@ -21,13 +21,18 @@ class FunctionProvider implements Extension
      */
     private array $functionRegistry = [];
 
-    public function build(string $code, ParseResult $parseResult, Scope $functions): string
+    public function parse(string $code, Scope $functions): string
     {
         $codeWithoutStrings = $this->clearCodeFromStrings($code);
         foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
             $this->isWordAllowed($notAllowedWord, $codeWithoutStrings);
         }
 
+        return $code;
+    }
+
+    public function build(string $code, ParseResult $parseResult, Scope $functions): string
+    {
         foreach ($parseResult->getFunctionCalls() as $functionName) {
             if (!function_exists($functionName)) {
                 if ($this->hasFunction($functionName)) {

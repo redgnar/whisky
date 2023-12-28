@@ -48,7 +48,7 @@ class BasicSecurityTest extends TestCase
         // Test code with banned words
         $withBannedWords = 'die("this should not pass");';
         $this->expectException(ParseError::class);
-        $basicSec->build($withBannedWords, $parseResultMock, $scopeMock);
+        $basicSec->parse($withBannedWords, $scopeMock);
     }
 
     public function testOkUsage(): void

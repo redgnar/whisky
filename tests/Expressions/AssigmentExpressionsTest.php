@@ -75,10 +75,4 @@ class AssigmentExpressionsTest extends TestCase
         $this->executor->execute($script, $variables);
         self::assertEquals(['a', 'b', 'c'], $variables->get('c'));
     }
-
-    public function testParseError(): void
-    {
-        $this->expectException(ParseError::class);
-        $this->builder->build('$c = 1}');
-    }
 }

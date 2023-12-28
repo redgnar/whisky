@@ -170,7 +170,6 @@ class NodeVisitor extends NodeVisitorAbstract
                     $this->assignRightSide = null;
                 }
             }
-            $this->outputVaraibles[] = 'return';
 
             return new \PhpParser\Node\Stmt\Expression(new Assign(new Variable('return'), $node->expr ?? new Node\Expr\ConstFetch(new Name('null'))));
         } elseif ($node instanceof Node\Stmt\Foreach_ && !empty($this->loopVariables)) {

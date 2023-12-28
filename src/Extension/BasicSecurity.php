@@ -28,13 +28,18 @@ class BasicSecurity implements Extension
         'readlink', 'readdir', 'is_writable', 'is_readable',
     ];
 
-    public function build(string $code, ParseResult $parseResult, Scope $functions): string
+    public function parse(string $code, Scope $functions): string
     {
         $codeWithoutStrings = $this->clearCodeFromStrings($code);
         foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
             $this->isWordAllowed($notAllowedWord, $codeWithoutStrings);
         }
 
+        return $code;
+    }
+
+    public function build(string $code, ParseResult $parseResult, Scope $functions): string
+    {
         $notAllowedFunctionsUsed = array_intersect(self::NOT_ALLOWED_FUNCTIONS, $parseResult->getFunctionCalls());
         if (!empty($notAllowedFunctionsUsed)) {
             throw new ParseError($this->getNotAllowedFunctionsErrorMessage($notAllowedFunctionsUsed));
