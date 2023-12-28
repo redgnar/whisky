@@ -18,6 +18,7 @@ class BasicExecutor implements Executor
             if (str_contains($message, 'Undefined array key')) {
                 $message = str_replace('Undefined array key', 'Undefined variable', $message);
             }
+
             throw new RunError($message, $e->getCode(), $e);
         }
     }

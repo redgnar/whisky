@@ -95,7 +95,8 @@ class NodeVisitor extends NodeVisitorAbstract
                 $this->outputVaraibles,
                 true
             ) && !in_array($node->expr->name, $this->loopVariables, true
-            ) && !in_array($node->expr->name, $this->inputVariables, true)) {
+            ) && !in_array($node->expr->name, $this->inputVariables, true
+            ) && !in_array($node->expr->name, $this->outputVaraibles, true)) {
                 $this->inputVariables[] = $node->expr->name;
             }
         } elseif ($node instanceof Variable && is_string($node->name) && !in_array(
@@ -113,6 +114,7 @@ class NodeVisitor extends NodeVisitorAbstract
                 $this->outputVaraibles[] = $node->name;
             } elseif ($this->assignRightSide // INPUT VARIABLES
                 && !in_array($node->name, $this->inputVariables, true)
+                && !in_array($node->name, $this->outputVaraibles, true)
                 && ($this->assignRightSide === $node || $this->isChildOfNode($this->assignRightSide, $node))) {
                 $this->inputVariables[] = $node->name;
             }
@@ -130,7 +132,8 @@ class NodeVisitor extends NodeVisitorAbstract
                     $this->outputVaraibles,
                     true
                 ) && !in_array($arg->value->name, $this->loopVariables, true
-                ) && !in_array($arg->value->name, $this->inputVariables, true)) {
+                ) && !in_array($arg->value->name, $this->inputVariables, true
+                ) && !in_array($arg->value->name, $this->outputVaraibles, true)) {
                     $this->inputVariables[] = $arg->value->name;
                 }
             }
