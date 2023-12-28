@@ -38,6 +38,34 @@ class ParseTest extends TestCase
         self::assertEmpty($script->getParseResult()->getOutputVariables());
     }
 
+    public function testOnlyInput(): void
+    {
+        $script = $this->builder->build('return $result;');
+        self::assertInstanceOf(Script::class, $script);
+        self::assertNotEmpty($script->getParseResult()->getInputVariables());
+        self::assertContains('result', $script->getParseResult()->getInputVariables());
+        self::assertEmpty($script->getParseResult()->getOutputVariables());
+    }
+
+    public function testOnlyOutput(): void
+    {
+        $script = $this->builder->build('$result = "foo";');
+        self::assertInstanceOf(Script::class, $script);
+        self::assertEmpty($script->getParseResult()->getInputVariables());
+        self::assertNotEmpty($script->getParseResult()->getOutputVariables());
+        self::assertContains('result', $script->getParseResult()->getOutputVariables());
+    }
+
+    public function testInputAndOutput(): void
+    {
+        $script = $this->builder->build('$result = implode(",", $collection); return $result;');
+        self::assertInstanceOf(Script::class, $script);
+        self::assertNotEmpty($script->getParseResult()->getInputVariables());
+        self::assertContains('collection', $script->getParseResult()->getInputVariables());
+        self::assertNotEmpty($script->getParseResult()->getOutputVariables());
+        self::assertContains('result', $script->getParseResult()->getOutputVariables());
+    }
+
     public function testParseError(): void
     {
         $this->expectException(ParseError::class);
