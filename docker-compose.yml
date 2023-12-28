@@ -5,7 +5,7 @@ services:
   php:
     container_name: whisky-php
     restart: "no"
-    image: "gitlab.webchili.in:4567/docker-images/php-dev:8.2-fpm"
+    image: "gitlab.webchili.in:4567/docker-images/php-dev:8.1-fpm"
     volumes:
       - ./:/srv/app
     environment:
