@@ -11,6 +11,7 @@ use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
 use Whisky\Extension\FunctionProvider;
 use Whisky\Extension\VariableHandler;
+use Whisky\InputError;
 use Whisky\ParseError;
 use Whisky\Parser\PhpParser;
 use Whisky\RunError;
@@ -54,7 +55,7 @@ class AssigmentExpressionsTest extends TestCase
 
     public function testExecuteMissingVariable1(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InputError::class);
         $variables = new BasicScope();
         $script = $this->builder->build('$b = substr($test, 0, 5);');
         $this->executor->execute($script, $variables);
@@ -62,7 +63,7 @@ class AssigmentExpressionsTest extends TestCase
 
     public function testExecuteMissingVariable2(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InputError::class);
         $variables = new BasicScope();
         $script = $this->builder->build('foreach ($input as $a) {}');
         $this->executor->execute($script, $variables);

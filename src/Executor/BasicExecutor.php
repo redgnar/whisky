@@ -3,6 +3,7 @@
 namespace Whisky\Executor;
 
 use Whisky\Executor;
+use Whisky\InputError;
 use Whisky\RunError;
 use Whisky\Scope;
 use Whisky\Script;
@@ -18,7 +19,7 @@ class BasicExecutor implements Executor
             }
         }
         if (!empty($notPassedVariables)) {
-            throw new \InvalidArgumentException(sprintf('Script missing input variables: $1%s', implode(', ', $notPassedVariables)));
+            throw new InputError(sprintf('Script missing input variables: $1%s', implode(', ', $notPassedVariables)));
         }
         try {
             return $script->getCodeRunner()($variables);
