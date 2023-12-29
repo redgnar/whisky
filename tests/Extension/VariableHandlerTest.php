@@ -18,7 +18,7 @@ class VariableHandlerTest extends TestCase
 
     public function testBuild(): void
     {
-        $parseResult = new ParseResult('parsedCode', ['inputVar'], ['outputVar'], ['functionCalls']);
+        $parseResult = new ParseResult('parsedCode', ['inputVar'], ['outputVar'], ['functionCalls'], true);
         $whiskyScope = $this->createMock(\Whisky\Scope::class);
         // Prepare
         $whiskyScope->method('get')->willReturn('value');

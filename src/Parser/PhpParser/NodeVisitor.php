@@ -30,6 +30,7 @@ class NodeVisitor extends NodeVisitorAbstract
      * @var string[]
      */
     private array $functionCalls = [];
+    private bool $returnValue = false;
     /**
      * @var Node[]
      */
@@ -59,6 +60,11 @@ class NodeVisitor extends NodeVisitorAbstract
     public function getFunctionCalls(): array
     {
         return $this->functionCalls;
+    }
+
+    public function hasReturnValue(): bool
+    {
+        return $this->returnValue;
     }
 
     public function isChildOfNode(Node $node, Node $child): bool
@@ -170,6 +176,7 @@ class NodeVisitor extends NodeVisitorAbstract
                     $this->assignRightSide = null;
                 }
             }
+            $this->returnValue = true;
 
             return new \PhpParser\Node\Stmt\Expression(new Assign(new Variable('return'), $node->expr ?? new Node\Expr\ConstFetch(new Name('null'))));
         } elseif ($node instanceof Node\Stmt\Foreach_ && !empty($this->loopVariables)) {

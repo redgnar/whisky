@@ -11,8 +11,13 @@ class ParseResult
      * @param string[] $outputVariables
      * @param string[] $functionCalls
      */
-    public function __construct(private readonly string $parsedCode, private readonly array $inputVariables, private readonly array $outputVariables, private readonly array $functionCalls)
-    {
+    public function __construct(
+        private readonly string $parsedCode,
+        private readonly array $inputVariables,
+        private readonly array $outputVariables,
+        private readonly array $functionCalls,
+        private readonly bool $returnValue
+    ) {
     }
 
     public function getParsedCode(): string
@@ -42,5 +47,10 @@ class ParseResult
     public function getFunctionCalls(): array
     {
         return $this->functionCalls;
+    }
+
+    public function hasReturnValue(): bool
+    {
+        return $this->returnValue;
     }
 }

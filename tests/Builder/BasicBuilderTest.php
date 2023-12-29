@@ -22,7 +22,7 @@ class BasicBuilderTest extends TestCase
         $parser = $this->createMock(Parser::class);
         $builder = new BasicBuilder($parser);
         $environment = $this->createMock(Scope::class);
-        $parseResult = new ParseResult($code, [], [], []);
+        $parseResult = new ParseResult($code, [], [], [], false);
         $extension = $this->createMock(Extension::class);
         $parser->method('parse')->willReturn($parseResult);
         $extension->method('build')->willReturn($code);

@@ -36,6 +36,7 @@ class ParseTest extends TestCase
         self::assertInstanceOf(Script::class, $script);
         self::assertEmpty($script->getParseResult()->getInputVariables());
         self::assertEmpty($script->getParseResult()->getOutputVariables());
+        self::assertTrue($script->getParseResult()->hasReturnValue());
     }
 
     public function testOnlyInput(): void
@@ -45,6 +46,7 @@ class ParseTest extends TestCase
         self::assertNotEmpty($script->getParseResult()->getInputVariables());
         self::assertContains('result', $script->getParseResult()->getInputVariables());
         self::assertEmpty($script->getParseResult()->getOutputVariables());
+        self::assertTrue($script->getParseResult()->hasReturnValue());
     }
 
     public function testOnlyOutput(): void
@@ -54,6 +56,7 @@ class ParseTest extends TestCase
         self::assertEmpty($script->getParseResult()->getInputVariables());
         self::assertNotEmpty($script->getParseResult()->getOutputVariables());
         self::assertContains('result', $script->getParseResult()->getOutputVariables());
+        self::assertFalse($script->getParseResult()->hasReturnValue());
     }
 
     public function testInputAndOutput(): void
@@ -64,6 +67,7 @@ class ParseTest extends TestCase
         self::assertContains('collection', $script->getParseResult()->getInputVariables());
         self::assertNotEmpty($script->getParseResult()->getOutputVariables());
         self::assertContains('result', $script->getParseResult()->getOutputVariables());
+        self::assertTrue($script->getParseResult()->hasReturnValue());
     }
 
     public function testParseError(): void
