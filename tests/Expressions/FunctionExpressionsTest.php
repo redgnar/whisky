@@ -9,8 +9,9 @@ use Whisky\Builder\BasicBuilder;
 use Whisky\Executor;
 use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
-use Whisky\Extension\FunctionProvider;
+use Whisky\Extension\FunctionHandler;
 use Whisky\Extension\VariableHandler;
+use Whisky\Function\FunctionRepository;
 use Whisky\ParseError;
 use Whisky\Parser\PhpParser;
 use Whisky\RunError;
@@ -20,19 +21,21 @@ class FunctionExpressionsTest extends TestCase
 {
     protected Builder $builder;
     protected Executor $executor;
-    protected FunctionProvider $functionProvider;
+    protected FunctionHandler $functionHandler;
+    protected FunctionRepository $functionRepository;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->functionProvider = new FunctionProvider();
+        $this->functionRepository = new FunctionRepository();
+        $this->functionHandler = new FunctionHandler($this->functionRepository);
         $this->builder = new BasicBuilder(
             new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7))
         );
         $this->builder->addExtension(new BasicSecurity());
         $this->builder->addExtension(new VariableHandler());
-        $this->builder->addExtension($this->functionProvider);
-        $this->executor = new BasicExecutor();
+        $this->builder->addExtension($this->functionHandler);
+        $this->executor = new BasicExecutor($this->functionRepository);
     }
 
     public function testAssignExpression(): void
@@ -54,7 +57,7 @@ class FunctionExpressionsTest extends TestCase
     public function testFunctionCallFromProviderExpression(): void
     {
         $variables = new BasicScope();
-        $this->functionProvider->addFunction('testIt', function (string $text) {return $text; });
+        $this->functionRepository->set('testIt', function (string $text) {return $text; });
         $script = $this->builder->build('$b = testIt("test string");');
         $this->executor->execute($script, $variables);
         self::assertEquals('test string', $variables->get('b'));

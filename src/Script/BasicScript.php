@@ -13,8 +13,7 @@ class BasicScript implements Script
     public function __construct(
         private readonly string $code,
         private readonly string $resultCode,
-        private readonly ParseResult $parseResult,
-        private readonly \Closure $codeRunner
+        private readonly ParseResult $parseResult
     ) {
     }
 
@@ -31,10 +30,5 @@ class BasicScript implements Script
     public function getParseResult(): ParseResult
     {
         return $this->parseResult;
-    }
-
-    public function getCodeRunner(): \Closure
-    {
-        return $this->codeRunner;
     }
 }

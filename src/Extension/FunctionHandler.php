@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Whisky\Extension;
 
 use Whisky\Extension;
+use Whisky\Function\FunctionRepository;
 use Whisky\Parser\ParseResult;
 use Whisky\Scope;
 
-class FunctionProvider implements Extension
+class FunctionHandler implements Extension
 {
     use NotAllowedWord;
 
@@ -16,10 +17,10 @@ class FunctionProvider implements Extension
         '$functions',
     ];
 
-    /**
-     * @var array<string,\Closure>
-     */
-    private array $functionRegistry = [];
+    public function __construct(
+        private readonly FunctionRepository $functionRepository
+    ) {
+    }
 
     public function parse(string $code, Scope $functions): string
     {
@@ -35,32 +36,12 @@ class FunctionProvider implements Extension
     {
         foreach ($parseResult->getFunctionCalls() as $functionName) {
             if (!function_exists($functionName)) {
-                if ($this->hasFunction($functionName)) {
-                    $functions->set($functionName, $this->getFunction($functionName));
+                if ($this->functionRepository->has($functionName)) {
                     $code = preg_replace('/(^|\W)'.str_replace(['$'], ['\$'], $functionName).'($|\W)/', '${1}$functions[\''.$functionName.'\']${2}', $code) ?? '';
                 }
             }
         }
 
         return $code;
-    }
-
-    public function addFunction(string $functionName, \Closure $closure): void
-    {
-        $this->functionRegistry[$functionName] = $closure;
-    }
-
-    public function hasFunction(string $functionName): bool
-    {
-        return array_key_exists($functionName, $this->functionRegistry);
-    }
-
-    public function getFunction(string $functionName): \Closure
-    {
-        if (!array_key_exists($functionName, $this->functionRegistry)) {
-            throw new \InvalidArgumentException(sprintf('Function $1%s not declared', $functionName));
-        }
-
-        return $this->functionRegistry[$functionName];
     }
 }

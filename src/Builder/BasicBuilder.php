@@ -14,15 +14,14 @@ use Whisky\Script\BasicScript;
 
 class BasicBuilder implements Builder
 {
-    private Parser $parser;
     /**
      * @var Extension[]
      */
     private array $extensions = [];
 
-    public function __construct(Parser $parser)
-    {
-        $this->parser = $parser;
+    public function __construct(
+        private readonly Parser $parser
+    ) {
     }
 
     public function build(string $code, Scope $functions = null): Script
@@ -42,11 +41,7 @@ class BasicBuilder implements Builder
         return $this->createScript(
             $code,
             $resultCode,
-            $parseResult,
-            eval(sprintf(
-                $this->getCodeRunnerTemplate(),
-                $resultCode,
-            ))
+            $parseResult
         );
     }
 
@@ -55,17 +50,8 @@ class BasicBuilder implements Builder
         $this->extensions[] = $extension;
     }
 
-    protected function createScript(string $code, string $resultCode, ParseResult $parseResult, \Closure $codeRunner): Script
+    protected function createScript(string $code, string $resultCode, ParseResult $parseResult): Script
     {
-        return new BasicScript($code, $resultCode, $parseResult, $codeRunner);
-    }
-
-    protected function getCodeRunnerTemplate(): string
-    {
-        return <<<'EOD'
-return function(\Whisky\Scope $variables) use($functions) : mixed {
-%s
-};
-EOD;
+        return new BasicScript($code, $resultCode, $parseResult);
     }
 }

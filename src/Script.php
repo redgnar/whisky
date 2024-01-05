@@ -13,6 +13,4 @@ interface Script
     public function getResultCode(): string;
 
     public function getParseResult(): ParseResult;
-
-    public function getCodeRunner(): \Closure;
 }
