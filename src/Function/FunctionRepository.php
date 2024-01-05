@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Whisky\Function;
 
-use Whisky\Provider;
-use Whisky\Scope;
-
 /**
- * @extends \ArrayObject<string, mixed>
+ * @extends \ArrayObject<string, \Closure>
  */
-class FunctionRepository extends \ArrayObject implements Scope
+class FunctionRepository extends \ArrayObject
 {
     /**
      * @var Provider[]
@@ -32,7 +29,7 @@ class FunctionRepository extends \ArrayObject implements Scope
         return false;
     }
 
-    public function get(string $name): mixed
+    public function get(string $name): ?\Closure
     {
         if ($this->offsetExists($name)) {
             return $this->offsetGet($name);
@@ -52,7 +49,7 @@ class FunctionRepository extends \ArrayObject implements Scope
         $this->providers[] = $provider;
     }
 
-    public function set(string $name, mixed $value): void
+    public function set(string $name, \Closure $value): void
     {
         $this->offsetSet($name, $value);
     }

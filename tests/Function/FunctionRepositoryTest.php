@@ -3,14 +3,8 @@
 namespace Whisky\Test\Function;
 
 use PHPUnit\Framework\TestCase;
-use Whisky\Builder\BasicBuilder;
-use Whisky\Extension;
 use Whisky\Function\FunctionRepository;
-use Whisky\Parser;
-use Whisky\Parser\ParseResult;
-use Whisky\Provider;
-use Whisky\Scope;
-use Whisky\Script\BasicScript;
+use Whisky\Function\Provider;
 
 class FunctionRepositoryTest extends TestCase
 {
@@ -18,12 +12,12 @@ class FunctionRepositoryTest extends TestCase
     {
         $provider = $this->createMock(Provider::class);
         $provider->method('has')->willReturn(true);
-        $provider->method('get')->willReturn('foo');
+        $function = function () {return 'foo'; };
+        $provider->method('get')->willReturn($function);
         $scope = new FunctionRepository();
         $scope->addProvider($provider);
 
         $this->assertTrue($scope->has('bar'));
-        $this->assertEquals('foo', $scope->get('bar'));
+        $this->assertEquals($function, $scope->get('bar'));
     }
-
 }
