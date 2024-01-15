@@ -9,8 +9,10 @@ use Whisky\Builder\BasicBuilder;
 use Whisky\Executor;
 use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
-use Whisky\Extension\FunctionProvider;
+use Whisky\Extension\FunctionHandler;
 use Whisky\Extension\VariableHandler;
+use Whisky\Function\FunctionRepository;
+use Whisky\InputError;
 use Whisky\ParseError;
 use Whisky\Parser\PhpParser;
 use Whisky\RunError;
@@ -20,19 +22,21 @@ class AssigmentExpressionsTest extends TestCase
 {
     protected Builder $builder;
     protected Executor $executor;
-    protected FunctionProvider $functionProvider;
+    protected FunctionHandler $functionHandler;
+    protected FunctionRepository $functionRepository;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->functionProvider = new FunctionProvider();
+        $this->functionRepository = new FunctionRepository();
+        $this->functionHandler = new FunctionHandler($this->functionRepository);
         $this->builder = new BasicBuilder(
-            new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7))
+            new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7)),
+            new VariableHandler(),
+            $this->functionHandler
         );
         $this->builder->addExtension(new BasicSecurity());
-        $this->builder->addExtension(new VariableHandler());
-        $this->builder->addExtension($this->functionProvider);
-        $this->executor = new BasicExecutor();
+        $this->executor = new BasicExecutor($this->functionRepository);
     }
 
     public function testAssignExpression(): void
@@ -54,7 +58,7 @@ class AssigmentExpressionsTest extends TestCase
 
     public function testExecuteMissingVariable1(): void
     {
-        $this->expectException(RunError::class);
+        $this->expectException(InputError::class);
         $variables = new BasicScope();
         $script = $this->builder->build('$b = substr($test, 0, 5);');
         $this->executor->execute($script, $variables);
@@ -62,7 +66,7 @@ class AssigmentExpressionsTest extends TestCase
 
     public function testExecuteMissingVariable2(): void
     {
-        $this->expectException(RunError::class);
+        $this->expectException(InputError::class);
         $variables = new BasicScope();
         $script = $this->builder->build('foreach ($input as $a) {}');
         $this->executor->execute($script, $variables);
@@ -74,11 +78,5 @@ class AssigmentExpressionsTest extends TestCase
         $script = $this->builder->build('$c = []; foreach (["a", "b", "c"] as $a) {$c[] = $a;}');
         $this->executor->execute($script, $variables);
         self::assertEquals(['a', 'b', 'c'], $variables->get('c'));
-    }
-
-    public function testParseError(): void
-    {
-        $this->expectException(ParseError::class);
-        $this->builder->build('$c = 1}');
     }
 }

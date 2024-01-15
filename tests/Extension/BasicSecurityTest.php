@@ -9,6 +9,9 @@ use Whisky\Builder\BasicBuilder;
 use Whisky\Executor;
 use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
+use Whisky\Extension\FunctionHandler;
+use Whisky\Extension\VariableHandler;
+use Whisky\Function\FunctionRepository;
 use Whisky\ParseError;
 use Whisky\Parser\ParseResult;
 use Whisky\Parser\PhpParser;
@@ -26,34 +29,36 @@ class BasicSecurityTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $functionRepository = new FunctionRepository();
         $this->builder = new BasicBuilder(
-            new PhpParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7))
+            new PhpParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7)),
+            new VariableHandler(),
+            new FunctionHandler($functionRepository)
         );
         $this->builder->addExtension(new BasicSecurity());
-        $this->executor = new BasicExecutor();
+        $this->executor = new BasicExecutor($functionRepository);
     }
 
     public function testBuildMethod(): void
     {
         $basicSec = new BasicSecurity();
-        $scopeMock = $this->createMock(Scope::class);
         $parseResultMock = $this->createMock(ParseResult::class);
         $parseResultMock->method('getFunctionCalls')->willReturn([]);
 
         // Test code without banned words and functions
         $validCode = 'myvariable = "no_banned_words_here";';
-        $processedCode = $basicSec->build($validCode, $parseResultMock, $scopeMock);
+        $processedCode = $basicSec->build($validCode, $parseResultMock);
         $this->assertEquals($validCode, $processedCode, 'Ensuring that valid code is not changed.');
 
         // Test code with banned words
         $withBannedWords = 'die("this should not pass");';
         $this->expectException(ParseError::class);
-        $basicSec->build($withBannedWords, $parseResultMock, $scopeMock);
+        $basicSec->parse($withBannedWords);
     }
 
     public function testOkUsage(): void
     {
-        $script = $this->builder->build('$a = 1;', new BasicScope());
+        $script = $this->builder->build('$a = 1;');
         self::assertEquals('$a = 1;', $script->getCode());
     }
 

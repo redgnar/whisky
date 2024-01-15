@@ -15,13 +15,18 @@ class VariableHandler implements Extension
         '$variables',
     ];
 
-    public function build(string $code, ParseResult $parseResult, \Whisky\Scope $functions): string
+    public function parse(string $code): string
     {
         $codeWithoutStrings = $this->clearCodeFromStrings($code);
         foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
             $this->isWordAllowed($notAllowedWord, $codeWithoutStrings);
         }
 
+        return $code;
+    }
+
+    public function build(string $code, ParseResult $parseResult): string
+    {
         return $this->assignVariables(
             $code,
             $parseResult->getInputVariables(),

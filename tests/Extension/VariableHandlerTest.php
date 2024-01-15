@@ -9,27 +9,23 @@ use Whisky\Scope as WhiskyScope;
 
 class VariableHandlerTest extends TestCase
 {
-    private VariableHandler $scope;
+    private VariableHandler $variableHandlercope;
 
     protected function setUp(): void
     {
-        $this->scope = new VariableHandler();
+        $this->variableHandlercope = new VariableHandler();
     }
 
     public function testBuild(): void
     {
-        $parseResult = new ParseResult('parsedCode', ['inputVar'], ['outputVar'], ['functionCalls']);
-        $whiskyScope = $this->createMock(\Whisky\Scope::class);
-        // Prepare
-        $whiskyScope->method('get')->willReturn('value');
-        $expected = '$inputVar=$variables->get(\'inputVar\');if($variables->has(\'outputVar\'))$outputVar=$variables->get(\'outputVar\');'."\n".
-            'parsedCode'."\n".
-            '$variables->set(\'outputVar\', $outputVar);';
+        $parseResult = new ParseResult('parsedCode', ['inputVar'], ['outputVar'], ['functionCalls'], true);
 
         // Act
-        $actual = $this->scope->build('parsedCode', $parseResult, $whiskyScope);
+        $actual = $this->variableHandlercope->build('parsedCode', $parseResult);
 
         // Assert
-        $this->assertSame($expected, $actual);
+        $this->assertSame('$inputVar=$variables->get(\'inputVar\');if($variables->has(\'outputVar\'))$outputVar=$variables->get(\'outputVar\');'."\n".
+            'parsedCode'."\n".
+            '$variables->set(\'outputVar\', $outputVar);', $actual);
     }
 }

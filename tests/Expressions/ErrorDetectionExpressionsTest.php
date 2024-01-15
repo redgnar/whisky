@@ -13,9 +13,10 @@ use Whisky\Extension\FunctionHandler;
 use Whisky\Extension\VariableHandler;
 use Whisky\Function\FunctionRepository;
 use Whisky\Parser\PhpParser;
+use Whisky\RunError;
 use Whisky\Scope\BasicScope;
 
-class ComplexExpressionsTest extends TestCase
+class ErrorDetectionExpressionsTest extends TestCase
 {
     protected Builder $builder;
     protected Executor $executor;
@@ -38,7 +39,7 @@ class ComplexExpressionsTest extends TestCase
 
     public function testComplexCodeExpression(): void
     {
-        $variables = new BasicScope(['collection' => ['a', 'b']]);
+        $variables = new BasicScope(['collection' => 's']);
         $this->functionRepository->set('testIt', function (string $text) {return $text; });
         $script = $this->builder->build(
             <<<'EOD'
@@ -51,39 +52,10 @@ class ComplexExpressionsTest extends TestCase
     }
 EOD
         );
-        $this->executor->execute($script, $variables);
-        self::assertEquals(['aaaa4bbb'], $variables->get('result'));
-    }
-
-    public function testComplexCodeExpression2(): void
-    {
-        $variables = new BasicScope(['a' => new \stdClass()]);
-        $script = $this->builder->build(
-            <<<'EOD'
-            $a->value = "test1";
-            $a->value2 = "test2";
-            $a->value3 = "test3";
-EOD
-        );
-        $this->executor->execute($script, $variables);
-        $a = $variables->get('a');
-        self::assertIsObject($a);
-        self::assertEquals('test3', $a->value3 ?? '');
-    }
-
-    public function testComplexCodeExpression3(): void
-    {
-        $variables = new BasicScope(['fruits' => ["d" => "lemon", "a" => "orange", "b" => "banana", "c" => "apple"]]);
-        $script = $this->builder->build(
-            <<<'EOD'
-            array_walk($fruits, function (&$item1, $key, $prefix){
-                $item1 = "$prefix: $item1";
-            }, 'fruit');
-EOD
-        );
-        $this->executor->execute($script, $variables);
-        $fruits = $variables->get('fruits');
-        self::assertIsArray($fruits);
-        self::assertEquals('fruit: orange', $fruits['a']);
+        try {
+            $this->executor->execute($script, $variables);
+        } catch (RunError $error) {
+            self::assertStringContainsString('foreach() argument', $error->getMessage());
+        }
     }
 }

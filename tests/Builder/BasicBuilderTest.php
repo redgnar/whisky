@@ -20,15 +20,16 @@ class BasicBuilderTest extends TestCase
     {
         $code = 'echo "Hello, World!";';
         $parser = $this->createMock(Parser::class);
-        $builder = new BasicBuilder($parser);
-        $environment = $this->createMock(Scope::class);
-        $parseResult = new ParseResult($code, [], [], []);
+        $variableHandler = $this->createMock(Extension\VariableHandler::class);
+        $functionHandler = $this->createMock(Extension\FunctionHandler::class);
+        $builder = new BasicBuilder($parser, $variableHandler, $functionHandler);
+        $parseResult = new ParseResult($code, [], [], [], false);
         $extension = $this->createMock(Extension::class);
         $parser->method('parse')->willReturn($parseResult);
         $extension->method('build')->willReturn($code);
 
         $builder->addExtension($extension);
-        $result = $builder->build($code, $environment);
+        $result = $builder->build($code);
 
         $this->assertInstanceOf(BasicScript::class, $result);
     }

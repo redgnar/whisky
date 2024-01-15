@@ -7,7 +7,6 @@ namespace Whisky\Extension;
 use Whisky\Extension;
 use Whisky\ParseError;
 use Whisky\Parser\ParseResult;
-use Whisky\Scope;
 
 class BasicSecurity implements Extension
 {
@@ -15,7 +14,7 @@ class BasicSecurity implements Extension
 
     private const NOT_ALLOWED_WORDS = [
         '$this', 'die', 'exit', 'for', 'while', 'do',
-        'function', 'class', 'trait', 'abstract', 'include', 'include_once',
+        'class', 'trait', 'abstract', 'include', 'include_once',
         'require', 'require_once', 'interface', 'public', 'private', 'protected',
         'new', 'namespace', 'use', 'define', 'const', 'declare', 'enddeclare',
         'static', 'echo', 'eval', 'print', 'printf', 'printr', 'var_dump',
@@ -28,13 +27,18 @@ class BasicSecurity implements Extension
         'readlink', 'readdir', 'is_writable', 'is_readable',
     ];
 
-    public function build(string $code, ParseResult $parseResult, Scope $functions): string
+    public function parse(string $code): string
     {
         $codeWithoutStrings = $this->clearCodeFromStrings($code);
         foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
             $this->isWordAllowed($notAllowedWord, $codeWithoutStrings);
         }
 
+        return $code;
+    }
+
+    public function build(string $code, ParseResult $parseResult): string
+    {
         $notAllowedFunctionsUsed = array_intersect(self::NOT_ALLOWED_FUNCTIONS, $parseResult->getFunctionCalls());
         if (!empty($notAllowedFunctionsUsed)) {
             throw new ParseError($this->getNotAllowedFunctionsErrorMessage($notAllowedFunctionsUsed));

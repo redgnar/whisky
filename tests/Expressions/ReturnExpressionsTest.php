@@ -9,8 +9,9 @@ use Whisky\Builder\BasicBuilder;
 use Whisky\Executor;
 use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
-use Whisky\Extension\FunctionProvider;
+use Whisky\Extension\FunctionHandler;
 use Whisky\Extension\VariableHandler;
+use Whisky\Function\FunctionRepository;
 use Whisky\ParseError;
 use Whisky\Parser\PhpParser;
 use Whisky\RunError;
@@ -20,19 +21,21 @@ class ReturnExpressionsTest extends TestCase
 {
     protected Builder $builder;
     protected Executor $executor;
-    protected FunctionProvider $functionProvider;
+    protected FunctionHandler $functionHandler;
+    protected FunctionRepository $functionRepository;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->functionProvider = new FunctionProvider();
+        $this->functionRepository = new FunctionRepository();
+        $this->functionHandler = new FunctionHandler($this->functionRepository);
         $this->builder = new BasicBuilder(
-            new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7))
+            new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7)),
+            new VariableHandler(),
+            $this->functionHandler
         );
         $this->builder->addExtension(new BasicSecurity());
-        $this->builder->addExtension(new VariableHandler());
-        $this->builder->addExtension($this->functionProvider);
-        $this->executor = new BasicExecutor();
+        $this->executor = new BasicExecutor($this->functionRepository);
     }
 
     public function testReturnExpression(): void

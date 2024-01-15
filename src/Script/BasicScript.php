@@ -2,6 +2,7 @@
 
 namespace Whisky\Script;
 
+use Whisky\Parser\ParseResult;
 use Whisky\Runtime;
 use Whisky\Script;
 
@@ -12,7 +13,7 @@ class BasicScript implements Script
     public function __construct(
         private readonly string $code,
         private readonly string $resultCode,
-        private readonly \Closure $codeRunner
+        private readonly ParseResult $parseResult
     ) {
     }
 
@@ -26,8 +27,8 @@ class BasicScript implements Script
         return $this->resultCode;
     }
 
-    public function getCodeRunner(): \Closure
+    public function getParseResult(): ParseResult
     {
-        return $this->codeRunner;
+        return $this->parseResult;
     }
 }

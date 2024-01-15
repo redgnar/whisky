@@ -4,6 +4,7 @@
 [![Quality](https://github.com/redgnar/whisky/actions/workflows/quality.yml/badge.svg?branch=1.0)](https://github.com/redgnar/whisky/actions/workflows/quality.yml)
 [![Downloads](https://img.shields.io/packagist/dt/redgnar/whisky.svg?style=flat-square)](https://packagist.org/packages/redgnar/whisky)
 
+
 The Whisky The library is designed for the safe execution of PHP scripts, with the ability to set input variables and read output variables. The library allows for defining custom functions as well as security rules.
 
 ## Installation
@@ -24,16 +25,16 @@ Now, you can use the functionalities provided by the whisky library.
 use PhpParser\ParserFactory;
 ...
 
-$functionProvider = new FunctionProvider();
+$functionRepository = new FunctionRepository();;
 $builder = new BasicBuilder(
-    new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7))
+    new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7)),
+    new VariableHandler(),
+    new FunctionHandler($functionRepository)
 );
 $builder->addExtension(new BasicSecurity());
-$builder->addExtension(new VariableHandler());
-$builder->addExtension($functionProvider);
-$executor = new BasicExecutor();
+$executor = new BasicExecutor($functionRepository);
 $variables = new BasicScope(['collection' => ['a', 'b']]);
-$functionProvider->addFunction('testIt', function (string $text) {return $text; });
+$functionRepository->addFunction('testIt', function (string $text) {return $text; });
 $script = $builder->build(
             <<<'EOD'
     $result = [];

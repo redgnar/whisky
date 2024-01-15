@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Whisky;
 
+use Whisky\Parser\ParseResult;
+
 interface Script
 {
     public function getCode(): string;
 
     public function getResultCode(): string;
 
-    public function getCodeRunner(): \Closure;
+    public function getParseResult(): ParseResult;
 }

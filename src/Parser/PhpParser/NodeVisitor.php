@@ -11,6 +11,7 @@ use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
 use PhpParser\NodeVisitorAbstract;
+use Whisky\ParseError;
 
 class NodeVisitor extends NodeVisitorAbstract
 {
@@ -30,12 +31,14 @@ class NodeVisitor extends NodeVisitorAbstract
      * @var string[]
      */
     private array $functionCalls = [];
+    private bool $returnValue = false;
     /**
      * @var Node[]
      */
     private array $assignStack = [];
     private ?Node $assignLeftSide = null;
     private ?Node $assignRightSide = null;
+    private bool $isInClosure = false;
 
     /**
      * @return string[]
@@ -61,6 +64,11 @@ class NodeVisitor extends NodeVisitorAbstract
         return $this->functionCalls;
     }
 
+    public function hasReturnValue(): bool
+    {
+        return $this->returnValue;
+    }
+
     public function isChildOfNode(Node $node, Node $child): bool
     {
         foreach ($node->getSubNodeNames() as $name) {
@@ -75,6 +83,10 @@ class NodeVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node)
     {
+        if ($this->isInClosure) {
+            return null;
+        }
+
         if ($node instanceof Assign) {
             array_unshift($this->assignStack, $node);
             $this->assignLeftSide = $node->var;
@@ -95,7 +107,8 @@ class NodeVisitor extends NodeVisitorAbstract
                 $this->outputVaraibles,
                 true
             ) && !in_array($node->expr->name, $this->loopVariables, true
-            ) && !in_array($node->expr->name, $this->inputVariables, true)) {
+            ) && !in_array($node->expr->name, $this->inputVariables, true
+            ) && !in_array($node->expr->name, $this->outputVaraibles, true)) {
                 $this->inputVariables[] = $node->expr->name;
             }
         } elseif ($node instanceof Variable && is_string($node->name) && !in_array(
@@ -113,6 +126,7 @@ class NodeVisitor extends NodeVisitorAbstract
                 $this->outputVaraibles[] = $node->name;
             } elseif ($this->assignRightSide // INPUT VARIABLES
                 && !in_array($node->name, $this->inputVariables, true)
+                && !in_array($node->name, $this->outputVaraibles, true)
                 && ($this->assignRightSide === $node || $this->isChildOfNode($this->assignRightSide, $node))) {
                 $this->inputVariables[] = $node->name;
             }
@@ -125,15 +139,19 @@ class NodeVisitor extends NodeVisitorAbstract
             }
             // INPUT VARIABLES
             foreach ($node->args ?: [] as $arg) {
-                if ($arg instanceof Arg && $arg->value instanceof Variable && is_string($arg->value->name) && !in_array(
-                    $arg->value->name,
-                    $this->outputVaraibles,
-                    true
-                ) && !in_array($arg->value->name, $this->loopVariables, true
-                ) && !in_array($arg->value->name, $this->inputVariables, true)) {
+                if ($arg instanceof Arg && $arg->value instanceof Variable && is_string($arg->value->name)
+                    && !in_array($arg->value->name, $this->loopVariables, true)
+                    && !in_array($arg->value->name, $this->inputVariables, true)
+                    && !in_array($arg->value->name, $this->outputVaraibles, true)) {
                     $this->inputVariables[] = $arg->value->name;
+                    // Function can modify variable, so it should be added to output vars
+                    $this->outputVaraibles[] = $arg->value->name;
                 }
             }
+        } elseif ($node instanceof Node\Stmt\Function_) {
+            throw new ParseError('Declaration of function is not allowed');
+        } elseif ($node instanceof Node\Expr\Closure) {
+            $this->isInClosure = true;
         }
 
         return null;
@@ -141,6 +159,14 @@ class NodeVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node)
     {
+        if ($node instanceof Node\Expr\Closure) {
+            $this->isInClosure = false;
+
+            return null;
+        }
+        if ($this->isInClosure) {
+            return null;
+        }
         if ($node instanceof Assign) {
             if (!empty($this->assignStack) && $this->assignStack[0] === $node) {
                 array_shift($this->assignStack);
@@ -167,7 +193,7 @@ class NodeVisitor extends NodeVisitorAbstract
                     $this->assignRightSide = null;
                 }
             }
-            $this->outputVaraibles[] = 'return';
+            $this->returnValue = true;
 
             return new \PhpParser\Node\Stmt\Expression(new Assign(new Variable('return'), $node->expr ?? new Node\Expr\ConstFetch(new Name('null'))));
         } elseif ($node instanceof Node\Stmt\Foreach_ && !empty($this->loopVariables)) {

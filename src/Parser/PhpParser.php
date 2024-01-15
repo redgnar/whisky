@@ -40,7 +40,8 @@ class PhpParser implements Parser
             $this->processCodeAfterParse($prettyPrinter->prettyPrintFile($ast)),
             $visitor->getInputVariables(),
             $visitor->getOutputVaraibles(),
-            $visitor->getFunctionCalls()
+            $visitor->getFunctionCalls(),
+            $visitor->hasReturnValue(),
         );
     }
 
