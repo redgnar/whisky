@@ -70,4 +70,22 @@ EOD
         self::assertIsObject($a);
         self::assertEquals('test3', $a->value3 ?? '');
     }
+
+    public function testComplexCodeExpression3(): void
+    {
+        $variables = new BasicScope(['fruits' => ["d" => "lemon", "a" => "orange", "b" => "banana", "c" => "apple"]]);
+        $script = $this->builder->build(
+            <<<'EOD'
+            array_walk($fruits, function (&$item1, $key, $prefix){
+                $item1 = "$prefix: $item1";
+            }, 'fruit');
+            // Must write this to mark fruits as output variable
+            $fruits = $fruits;
+EOD
+        );
+        $this->executor->execute($script, $variables);
+        $fruits = $variables->get('fruits');
+        self::assertIsArray($fruits);
+        self::assertEquals('fruit: orange', $fruits['a']);
+    }
 }

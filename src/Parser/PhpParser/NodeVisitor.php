@@ -139,13 +139,10 @@ class NodeVisitor extends NodeVisitorAbstract
             }
             // INPUT VARIABLES
             foreach ($node->args ?: [] as $arg) {
-                if ($arg instanceof Arg && $arg->value instanceof Variable && is_string($arg->value->name) && !in_array(
-                    $arg->value->name,
-                    $this->outputVaraibles,
-                    true
-                ) && !in_array($arg->value->name, $this->loopVariables, true
-                ) && !in_array($arg->value->name, $this->inputVariables, true
-                ) && !in_array($arg->value->name, $this->outputVaraibles, true)) {
+                if ($arg instanceof Arg && $arg->value instanceof Variable && is_string($arg->value->name)
+                    && !in_array($arg->value->name, $this->loopVariables, true)
+                    && !in_array($arg->value->name, $this->inputVariables, true)
+                    && !in_array($arg->value->name, $this->outputVaraibles, true)) {
                     $this->inputVariables[] = $arg->value->name;
                 }
             }
