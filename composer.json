@@ -28,8 +28,8 @@
         }
     },
     "scripts": {
-        "check": [
-            "@style-fix",
+        "check-all": [
+            "@style",
             "@quality",
             "@test"
         ],
