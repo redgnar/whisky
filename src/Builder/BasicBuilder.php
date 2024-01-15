@@ -19,8 +19,12 @@ class BasicBuilder implements Builder
     private array $extensions = [];
 
     public function __construct(
-        private readonly Parser $parser
+        private readonly Parser $parser,
+        private readonly Extension\VariableHandler $variableHandler,
+        private readonly Extension\FunctionHandler $functionHandler,
     ) {
+        $this->addExtension($this->variableHandler);
+        $this->addExtension($this->functionHandler);
     }
 
     public function build(string $code): Script

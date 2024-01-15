@@ -31,11 +31,11 @@ class AssigmentExpressionsTest extends TestCase
         $this->functionRepository = new FunctionRepository();
         $this->functionHandler = new FunctionHandler($this->functionRepository);
         $this->builder = new BasicBuilder(
-            new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7))
+            new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7)),
+            new VariableHandler(),
+            $this->functionHandler
         );
         $this->builder->addExtension(new BasicSecurity());
-        $this->builder->addExtension(new VariableHandler());
-        $this->builder->addExtension($this->functionHandler);
         $this->executor = new BasicExecutor($this->functionRepository);
     }
 

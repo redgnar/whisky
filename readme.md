@@ -22,16 +22,16 @@ Now, you can use the functionalities provided by the whisky library.
 use PhpParser\ParserFactory;
 ...
 
-$functionProvider = new FunctionProvider();
+$functionRepository = new FunctionRepository();;
 $builder = new BasicBuilder(
-    new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7))
+    new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7)),
+    new VariableHandler(),
+    new FunctionHandler($functionRepository)
 );
 $builder->addExtension(new BasicSecurity());
-$builder->addExtension(new VariableHandler());
-$builder->addExtension($functionProvider);
-$executor = new BasicExecutor();
+$executor = new BasicExecutor($functionRepository);
 $variables = new BasicScope(['collection' => ['a', 'b']]);
-$functionProvider->addFunction('testIt', function (string $text) {return $text; });
+$functionRepository->addFunction('testIt', function (string $text) {return $text; });
 $script = $builder->build(
             <<<'EOD'
     $result = [];

@@ -9,6 +9,8 @@ use Whisky\Builder\BasicBuilder;
 use Whisky\Executor;
 use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
+use Whisky\Extension\FunctionHandler;
+use Whisky\Extension\VariableHandler;
 use Whisky\Function\FunctionRepository;
 use Whisky\ParseError;
 use Whisky\Parser\ParseResult;
@@ -27,11 +29,14 @@ class BasicSecurityTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+        $functionRepository = new FunctionRepository();
         $this->builder = new BasicBuilder(
-            new PhpParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7))
+            new PhpParser((new ParserFactory())->create(ParserFactory::PREFER_PHP7)),
+            new VariableHandler(),
+            new FunctionHandler($functionRepository)
         );
         $this->builder->addExtension(new BasicSecurity());
-        $this->executor = new BasicExecutor(new FunctionRepository());
+        $this->executor = new BasicExecutor($functionRepository);
     }
 
     public function testBuildMethod(): void

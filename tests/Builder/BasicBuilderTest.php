@@ -20,7 +20,9 @@ class BasicBuilderTest extends TestCase
     {
         $code = 'echo "Hello, World!";';
         $parser = $this->createMock(Parser::class);
-        $builder = new BasicBuilder($parser);
+        $variableHandler = $this->createMock(Extension\VariableHandler::class);
+        $functionHandler = $this->createMock(Extension\FunctionHandler::class);
+        $builder = new BasicBuilder($parser, $variableHandler, $functionHandler);
         $parseResult = new ParseResult($code, [], [], [], false);
         $extension = $this->createMock(Extension::class);
         $parser->method('parse')->willReturn($parseResult);
