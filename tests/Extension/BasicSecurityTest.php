@@ -37,24 +37,23 @@ class BasicSecurityTest extends TestCase
     public function testBuildMethod(): void
     {
         $basicSec = new BasicSecurity();
-        $scopeMock = $this->createMock(Scope::class);
         $parseResultMock = $this->createMock(ParseResult::class);
         $parseResultMock->method('getFunctionCalls')->willReturn([]);
 
         // Test code without banned words and functions
         $validCode = 'myvariable = "no_banned_words_here";';
-        $processedCode = $basicSec->build($validCode, $parseResultMock, $scopeMock);
+        $processedCode = $basicSec->build($validCode, $parseResultMock);
         $this->assertEquals($validCode, $processedCode, 'Ensuring that valid code is not changed.');
 
         // Test code with banned words
         $withBannedWords = 'die("this should not pass");';
         $this->expectException(ParseError::class);
-        $basicSec->parse($withBannedWords, $scopeMock);
+        $basicSec->parse($withBannedWords);
     }
 
     public function testOkUsage(): void
     {
-        $script = $this->builder->build('$a = 1;', new BasicScope());
+        $script = $this->builder->build('$a = 1;');
         self::assertEquals('$a = 1;', $script->getCode());
     }
 

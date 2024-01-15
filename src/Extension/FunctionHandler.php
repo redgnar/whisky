@@ -7,7 +7,6 @@ namespace Whisky\Extension;
 use Whisky\Extension;
 use Whisky\Function\FunctionRepository;
 use Whisky\Parser\ParseResult;
-use Whisky\Scope;
 
 class FunctionHandler implements Extension
 {
@@ -22,7 +21,7 @@ class FunctionHandler implements Extension
     ) {
     }
 
-    public function parse(string $code, Scope $functions): string
+    public function parse(string $code): string
     {
         $codeWithoutStrings = $this->clearCodeFromStrings($code);
         foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
@@ -32,7 +31,7 @@ class FunctionHandler implements Extension
         return $code;
     }
 
-    public function build(string $code, ParseResult $parseResult, Scope $functions): string
+    public function build(string $code, ParseResult $parseResult): string
     {
         foreach ($parseResult->getFunctionCalls() as $functionName) {
             if (!function_exists($functionName)) {

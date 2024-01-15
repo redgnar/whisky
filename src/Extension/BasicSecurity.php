@@ -7,7 +7,6 @@ namespace Whisky\Extension;
 use Whisky\Extension;
 use Whisky\ParseError;
 use Whisky\Parser\ParseResult;
-use Whisky\Scope;
 
 class BasicSecurity implements Extension
 {
@@ -28,7 +27,7 @@ class BasicSecurity implements Extension
         'readlink', 'readdir', 'is_writable', 'is_readable',
     ];
 
-    public function parse(string $code, Scope $functions): string
+    public function parse(string $code): string
     {
         $codeWithoutStrings = $this->clearCodeFromStrings($code);
         foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
@@ -38,7 +37,7 @@ class BasicSecurity implements Extension
         return $code;
     }
 
-    public function build(string $code, ParseResult $parseResult, Scope $functions): string
+    public function build(string $code, ParseResult $parseResult): string
     {
         $notAllowedFunctionsUsed = array_intersect(self::NOT_ALLOWED_FUNCTIONS, $parseResult->getFunctionCalls());
         if (!empty($notAllowedFunctionsUsed)) {

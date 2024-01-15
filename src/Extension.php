@@ -8,7 +8,7 @@ use Whisky\Parser\ParseResult;
 
 interface Extension
 {
-    public function parse(string $code, Scope $functions): string;
+    public function parse(string $code): string;
 
-    public function build(string $code, ParseResult $parseResult, Scope $functions): string;
+    public function build(string $code, ParseResult $parseResult): string;
 }

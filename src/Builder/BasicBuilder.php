@@ -8,7 +8,6 @@ use Whisky\Builder;
 use Whisky\Extension;
 use Whisky\Parser;
 use Whisky\Parser\ParseResult;
-use Whisky\Scope;
 use Whisky\Script;
 use Whisky\Script\BasicScript;
 
@@ -24,17 +23,16 @@ class BasicBuilder implements Builder
     ) {
     }
 
-    public function build(string $code, Scope $functions = null): Script
+    public function build(string $code): Script
     {
-        $functions ??= new Scope\BasicScope();
         $resultCode = $code;
         foreach ($this->extensions as $extension) {
-            $resultCode = $extension->parse($resultCode, $functions);
+            $resultCode = $extension->parse($resultCode);
         }
         $parseResult = $this->parser->parse($resultCode);
         $resultCode = $parseResult->getParsedCode();
         foreach ($this->extensions as $extension) {
-            $resultCode = $extension->build($resultCode, $parseResult, $functions);
+            $resultCode = $extension->build($resultCode, $parseResult);
         }
         $resultCode .= ' return $return ?? null;';
 
