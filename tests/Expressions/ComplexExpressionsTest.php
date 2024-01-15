@@ -79,8 +79,6 @@ EOD
             array_walk($fruits, function (&$item1, $key, $prefix){
                 $item1 = "$prefix: $item1";
             }, 'fruit');
-            // Must write this to mark fruits as output variable
-            $fruits = $fruits;
 EOD
         );
         $this->executor->execute($script, $variables);

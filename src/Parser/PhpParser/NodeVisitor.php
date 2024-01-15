@@ -144,6 +144,8 @@ class NodeVisitor extends NodeVisitorAbstract
                     && !in_array($arg->value->name, $this->inputVariables, true)
                     && !in_array($arg->value->name, $this->outputVaraibles, true)) {
                     $this->inputVariables[] = $arg->value->name;
+                    // Function can modify variable, so it should be added to output vars
+                    $this->outputVaraibles[] = $arg->value->name;
                 }
             }
         } elseif ($node instanceof Node\Stmt\Function_) {
