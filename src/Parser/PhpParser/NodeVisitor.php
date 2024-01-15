@@ -11,6 +11,7 @@ use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
 use PhpParser\NodeVisitorAbstract;
+use Whisky\ParseError;
 
 class NodeVisitor extends NodeVisitorAbstract
 {
@@ -37,6 +38,7 @@ class NodeVisitor extends NodeVisitorAbstract
     private array $assignStack = [];
     private ?Node $assignLeftSide = null;
     private ?Node $assignRightSide = null;
+    private bool $isInClosure = false;
 
     /**
      * @return string[]
@@ -81,6 +83,10 @@ class NodeVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node)
     {
+        if ($this->isInClosure) {
+            return null;
+        }
+
         if ($node instanceof Assign) {
             array_unshift($this->assignStack, $node);
             $this->assignLeftSide = $node->var;
@@ -143,6 +149,10 @@ class NodeVisitor extends NodeVisitorAbstract
                     $this->inputVariables[] = $arg->value->name;
                 }
             }
+        } elseif ($node instanceof Node\Stmt\Function_) {
+            throw new ParseError('Declaration of function is not allowed');
+        } elseif ($node instanceof Node\Expr\Closure) {
+            $this->isInClosure = true;
         }
 
         return null;
@@ -150,6 +160,14 @@ class NodeVisitor extends NodeVisitorAbstract
 
     public function leaveNode(Node $node)
     {
+        if ($node instanceof Node\Expr\Closure) {
+            $this->isInClosure = false;
+
+            return null;
+        }
+        if ($this->isInClosure) {
+            return null;
+        }
         if ($node instanceof Assign) {
             if (!empty($this->assignStack) && $this->assignStack[0] === $node) {
                 array_shift($this->assignStack);

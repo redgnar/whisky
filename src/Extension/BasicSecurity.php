@@ -14,7 +14,7 @@ class BasicSecurity implements Extension
 
     private const NOT_ALLOWED_WORDS = [
         '$this', 'die', 'exit', 'for', 'while', 'do',
-        'function', 'class', 'trait', 'abstract', 'include', 'include_once',
+        'class', 'trait', 'abstract', 'include', 'include_once',
         'require', 'require_once', 'interface', 'public', 'private', 'protected',
         'new', 'namespace', 'use', 'define', 'const', 'declare', 'enddeclare',
         'static', 'echo', 'eval', 'print', 'printf', 'printr', 'var_dump',

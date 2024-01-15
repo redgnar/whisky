@@ -79,4 +79,18 @@ class ParseTest extends TestCase
         $this->expectException(ParseError::class);
         $this->builder->build('$c = 1}');
     }
+
+    public function testNotAllowedFunctionUsage(): void
+    {
+        $this->expectException(ParseError::class);
+        $script = $this->builder->build('function test(){};');
+    }
+
+    public function testAllowedLambdaFunctionUsage(): void
+    {
+        $script = $this->builder->build('$a = function($ech){return $ech;}; $b=$a("bar");');
+        self::assertInstanceOf(Script::class, $script);
+        self::assertEmpty($script->getParseResult()->getInputVariables());
+        self::assertNotEmpty($script->getParseResult()->getOutputVariables());
+    }
 }
