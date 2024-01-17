@@ -46,7 +46,7 @@ $script = $builder->build(
     }
 EOD
 );
-$this->executor->execute($script, $variables);
+$executor->execute($script, $variables);
 var_dump($variables->get('result'));
 ```
 
