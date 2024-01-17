@@ -25,7 +25,7 @@ Now, you can use the functionalities provided by the whisky library.
 use PhpParser\ParserFactory;
 ...
 
-$functionRepository = new FunctionRepository();;
+$functionRepository = new FunctionRepository();
 $builder = new BasicBuilder(
     new PhpParser((new ParserFactory())->create(ParserFactory::ONLY_PHP7)),
     new VariableHandler(),
