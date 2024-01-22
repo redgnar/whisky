@@ -72,9 +72,18 @@ class NodeVisitor extends NodeVisitorAbstract
     public function isChildOfNode(Node $node, Node $child): bool
     {
         foreach ($node->getSubNodeNames() as $name) {
-            if ($node->{$name} instanceof Node
-                && ($node->{$name} === $child || $this->isChildOfNode($node->{$name}, $child))) {
-                return true;
+            if ($node->{$name} instanceof Node) {
+                if ($node->{$name} === $child || $this->isChildOfNode($node->{$name}, $child)) {
+                    return true;
+                }
+            } elseif (is_array($node->{$name})) {
+                foreach ($node->{$name} as $subNode) {
+                    if ($subNode instanceof Node) {
+                        if ($subNode === $child || $this->isChildOfNode($subNode, $child)) {
+                            return true;
+                        }
+                    }
+                }
             }
         }
 
@@ -101,16 +110,6 @@ class NodeVisitor extends NodeVisitorAbstract
             if ($node->valueVar instanceof Variable && is_string($node->valueVar->name)) {
                 array_unshift($this->loopVariables, $node->valueVar->name);
             }
-            // INPUT VARIABLES
-            if ($node->expr instanceof Variable && is_string($node->expr->name) && !in_array(
-                $node->expr->name,
-                $this->outputVaraibles,
-                true
-            ) && !in_array($node->expr->name, $this->loopVariables, true
-            ) && !in_array($node->expr->name, $this->inputVariables, true
-            ) && !in_array($node->expr->name, $this->outputVaraibles, true)) {
-                $this->inputVariables[] = $node->expr->name;
-            }
         } elseif ($node instanceof Variable && is_string($node->name) && !in_array(
             $node->name,
             $this->outputVaraibles,
@@ -120,15 +119,20 @@ class NodeVisitor extends NodeVisitorAbstract
             $this->loopVariables,
             true
         )) {
-            // OUTPUT VARIABLES
-            if ($this->assignLeftSide
-                && ($this->assignLeftSide === $node || $this->isChildOfNode($this->assignLeftSide, $node))) {
-                $this->outputVaraibles[] = $node->name;
-            } elseif ($this->assignRightSide // INPUT VARIABLES
-                && !in_array($node->name, $this->inputVariables, true)
-                && !in_array($node->name, $this->outputVaraibles, true)
-                && ($this->assignRightSide === $node || $this->isChildOfNode($this->assignRightSide, $node))) {
-                $this->inputVariables[] = $node->name;
+            if ($this->assignRightSide) {
+                // OUTPUT VARIABLES
+                if ($this->assignLeftSide
+                    && ($this->assignLeftSide === $node || $this->isChildOfNode($this->assignLeftSide, $node))) {
+                    $this->outputVaraibles[] = $node->name;
+                } elseif (!in_array($node->name, $this->inputVariables, true)
+                    && ($this->assignRightSide === $node || $this->isChildOfNode($this->assignRightSide, $node))) {
+                    $this->inputVariables[] = $node->name;
+                }
+            } else {
+                // INPUT VARIABLES
+                if (!in_array($node->name, $this->inputVariables, true)) {
+                    $this->inputVariables[] = $node->name;
+                }
             }
         } elseif ($node instanceof FuncCall) {
             // FUNCTION CALLS
@@ -140,12 +144,14 @@ class NodeVisitor extends NodeVisitorAbstract
             // INPUT VARIABLES
             foreach ($node->args ?: [] as $arg) {
                 if ($arg instanceof Arg && $arg->value instanceof Variable && is_string($arg->value->name)
-                    && !in_array($arg->value->name, $this->loopVariables, true)
-                    && !in_array($arg->value->name, $this->inputVariables, true)
-                    && !in_array($arg->value->name, $this->outputVaraibles, true)) {
-                    $this->inputVariables[] = $arg->value->name;
+                    && !in_array($arg->value->name, $this->loopVariables, true)) {
+                    if (!in_array($arg->value->name, $this->inputVariables, true)) {
+                        $this->inputVariables[] = $arg->value->name;
+                    }
                     // Function can modify variable, so it should be added to output vars
-                    $this->outputVaraibles[] = $arg->value->name;
+                    if (!in_array($arg->value->name, $this->outputVaraibles, true)) {
+                        $this->outputVaraibles[] = $arg->value->name;
+                    }
                 }
             }
         } elseif ($node instanceof Node\Stmt\Function_) {

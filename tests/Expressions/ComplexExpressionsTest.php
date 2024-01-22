@@ -86,4 +86,36 @@ EOD
         self::assertIsArray($fruits);
         self::assertEquals('fruit: orange', $fruits['a']);
     }
+
+    public function testComplexCodeExpression4(): void
+    {
+        $variables = new BasicScope(['test1' => 1, 'test2' => 2]);
+        $script = $this->builder->build(
+            <<<'EOD'
+            if ($test1 === $test2) {
+                $output = 2;
+            } else {
+                $output = 1;
+            }
+EOD
+        );
+        $this->executor->execute($script, $variables);
+        $output = $variables->get('output');
+        self::assertIsInt($output);
+        self::assertEquals(1, $output);
+    }
+
+    public function testComplexCodeExpression5(): void
+    {
+        $variables = new BasicScope(['test1' => 1, 'test2' => 2]);
+        $script = $this->builder->build(
+            <<<'EOD'
+            $output = [$test1, $test2];
+EOD
+        );
+        $this->executor->execute($script, $variables);
+        $output = $variables->get('output');
+        self::assertIsArray($output);
+        self::assertEquals([1, 2], $output);
+    }
 }
