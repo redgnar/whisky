@@ -34,7 +34,7 @@ class ParseTest extends TestCase
         $this->builder->addExtension(new BasicSecurity());
     }
 
-    public function testNoInputAndOutput(): void
+    public function testNoInputAndReturn(): void
     {
         $script = $this->builder->build('return "Hello World";');
         self::assertInstanceOf(Script::class, $script);
@@ -72,6 +72,16 @@ class ParseTest extends TestCase
         self::assertNotEmpty($script->getParseResult()->getOutputVariables());
         self::assertContains('result', $script->getParseResult()->getOutputVariables());
         self::assertTrue($script->getParseResult()->hasReturnValue());
+    }
+
+    public function testNoInputAndOutput(): void
+    {
+        $script = $this->builder->build('$result = 1; if (1 === $result) {return;}');
+        self::assertInstanceOf(Script::class, $script);
+        self::assertEmpty($script->getParseResult()->getInputVariables());
+        self::assertNotEmpty($script->getParseResult()->getOutputVariables());
+        self::assertContains('result', $script->getParseResult()->getOutputVariables());
+        self::assertFalse($script->getParseResult()->hasReturnValue());
     }
 
     public function testParseError(): void

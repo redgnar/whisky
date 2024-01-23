@@ -98,7 +98,7 @@ class VariableVisitor extends NodeVisitorAbstract
             }
         } elseif ($node instanceof Arg && $node->value instanceof Variable && is_string($node->value->name)
             && !in_array($node->value->name, $this->loopVariables, true)) {
-            if (!in_array($node->value->name, $this->inputVariables, true)) {
+            if (!in_array($node->value->name, $this->inputVariables, true) && !in_array($node->value->name, $this->outputVaraibles, true)) {
                 $this->inputVariables[] = $node->value->name;
             }
             // Function can modify variable, so it should be added to output vars
