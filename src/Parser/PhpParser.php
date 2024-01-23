@@ -10,7 +10,8 @@ use PhpParser\Parser as NikicPhpParser;
 use PhpParser\PrettyPrinter;
 use Whisky\ParseError;
 use Whisky\Parser;
-use Whisky\Parser\PhpParser\NodeVisitor;
+use Whisky\Parser\PhpParser\FunctionVisitor;
+use Whisky\Parser\PhpParser\VariableVisitor;
 
 class PhpParser implements Parser
 {
@@ -30,18 +31,20 @@ class PhpParser implements Parser
             throw new ParseError($e->getMessage());
         }
         $traverser = new NodeTraverser();
-        $visitor = new NodeVisitor();
-        $traverser->addVisitor($visitor);
+        $variableVisitor = new VariableVisitor();
+        $traverser->addVisitor($variableVisitor);
+        $functionVisitor = new FunctionVisitor();
+        $traverser->addVisitor($functionVisitor);
         $ast = $traverser->traverse($ast);
 
         $prettyPrinter = new PrettyPrinter\Standard();
 
         return new ParseResult(
             $this->processCodeAfterParse($prettyPrinter->prettyPrintFile($ast)),
-            $visitor->getInputVariables(),
-            $visitor->getOutputVaraibles(),
-            $visitor->getFunctionCalls(),
-            $visitor->hasReturnValue(),
+            $variableVisitor->getInputVariables(),
+            $variableVisitor->getOutputVaraibles(),
+            $functionVisitor->getFunctionCalls(),
+            $variableVisitor->hasReturnValue(),
         );
     }
 

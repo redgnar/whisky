@@ -13,7 +13,7 @@ use PhpParser\Node\Name;
 use PhpParser\NodeVisitorAbstract;
 use Whisky\ParseError;
 
-class NodeVisitor extends NodeVisitorAbstract
+class VariableVisitor extends NodeVisitorAbstract
 {
     /**
      * @var string[]
@@ -27,10 +27,6 @@ class NodeVisitor extends NodeVisitorAbstract
      * @var string[]
      */
     private array $loopVariables = [];
-    /**
-     * @var string[]
-     */
-    private array $functionCalls = [];
     private bool $returnValue = false;
     /**
      * @var Node[]
@@ -54,14 +50,6 @@ class NodeVisitor extends NodeVisitorAbstract
     public function getOutputVaraibles(): array
     {
         return $this->outputVaraibles;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getFunctionCalls(): array
-    {
-        return $this->functionCalls;
     }
 
     public function hasReturnValue(): bool
@@ -110,6 +98,15 @@ class NodeVisitor extends NodeVisitorAbstract
             if ($node->valueVar instanceof Variable && is_string($node->valueVar->name)) {
                 array_unshift($this->loopVariables, $node->valueVar->name);
             }
+        } elseif ($node instanceof Arg && $node->value instanceof Variable && is_string($node->value->name)
+            && !in_array($node->value->name, $this->loopVariables, true)) {
+            if (!in_array($node->value->name, $this->inputVariables, true)) {
+                $this->inputVariables[] = $node->value->name;
+            }
+            // Function can modify variable, so it should be added to output vars
+            if (!in_array($node->value->name, $this->outputVaraibles, true)) {
+                $this->outputVaraibles[] = $node->value->name;
+            }
         } elseif ($node instanceof Variable && is_string($node->name) && !in_array(
             $node->name,
             $this->outputVaraibles,
@@ -134,28 +131,6 @@ class NodeVisitor extends NodeVisitorAbstract
                     $this->inputVariables[] = $node->name;
                 }
             }
-        } elseif ($node instanceof FuncCall) {
-            // FUNCTION CALLS
-            if ($node->name instanceof Name
-                && is_string($node->name->getParts()[0])
-                && !in_array($node->name->getParts()[0], $this->functionCalls, true)) {
-                $this->functionCalls[] = $node->name->getParts()[0];
-            }
-            // INPUT VARIABLES
-            foreach ($node->args ?: [] as $arg) {
-                if ($arg instanceof Arg && $arg->value instanceof Variable && is_string($arg->value->name)
-                    && !in_array($arg->value->name, $this->loopVariables, true)) {
-                    if (!in_array($arg->value->name, $this->inputVariables, true)) {
-                        $this->inputVariables[] = $arg->value->name;
-                    }
-                    // Function can modify variable, so it should be added to output vars
-                    if (!in_array($arg->value->name, $this->outputVaraibles, true)) {
-                        $this->outputVaraibles[] = $arg->value->name;
-                    }
-                }
-            }
-        } elseif ($node instanceof Node\Stmt\Function_) {
-            throw new ParseError('Declaration of function is not allowed');
         } elseif ($node instanceof Node\Expr\Closure) {
             $this->isInClosure = true;
         }
