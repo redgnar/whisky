@@ -5,17 +5,13 @@ declare(strict_types=1);
 namespace Whisky\Parser\PhpParser;
 
 use PhpParser\Node;
-use PhpParser\Node\Arg;
-use PhpParser\Node\Expr\Assign;
 use PhpParser\Node\Expr\FuncCall;
-use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
 use PhpParser\NodeVisitorAbstract;
 use Whisky\ParseError;
 
 class FunctionVisitor extends NodeVisitorAbstract
 {
-
     /**
      * @var string[]
      */
@@ -31,7 +27,7 @@ class FunctionVisitor extends NodeVisitorAbstract
 
     public function enterNode(Node $node)
     {
-       if ($node instanceof FuncCall) {
+        if ($node instanceof FuncCall) {
             // FUNCTION CALLS
             if ($node->name instanceof Name
                 && is_string($node->name->getParts()[0])

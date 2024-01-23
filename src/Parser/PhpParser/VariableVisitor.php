@@ -7,11 +7,9 @@ namespace Whisky\Parser\PhpParser;
 use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\Assign;
-use PhpParser\Node\Expr\FuncCall;
 use PhpParser\Node\Expr\Variable;
 use PhpParser\Node\Name;
 use PhpParser\NodeVisitorAbstract;
-use Whisky\ParseError;
 
 class VariableVisitor extends NodeVisitorAbstract
 {
@@ -50,11 +48,6 @@ class VariableVisitor extends NodeVisitorAbstract
     public function getOutputVaraibles(): array
     {
         return $this->outputVaraibles;
-    }
-
-    public function hasReturnValue(): bool
-    {
-        return $this->returnValue;
     }
 
     public function hasReturnValue(): bool
