@@ -156,4 +156,45 @@ EOD
         self::assertIsArray($result);
         self::assertEquals(2, $result['id_run']);
     }
+
+    public function testComplexCodeExpression7(): void
+    {
+        $variables = new BasicScope(['originally_accepting' => 2, 'checker' => 4]);
+        $script = $this->builder->build(
+            <<<'EOD'
+            $displayAs = 'Display Text';
+            
+            if ($checker !== $originally_accepting) {
+                $result = [
+                    'id_run' => $originally_accepting,
+                    'id_should_run' => $checker,
+                    'checker' => 'FOO :: '.$displayAs,
+                ];
+                
+                return;
+            }
+            
+            $firstly_assigned = ['usr_id' => 1];
+            if($firstly_assigned['usr_id'] == $checker) {
+                $result = [
+                    'id_run' => $checker,
+                    'id_should_run' => $checker,
+                    'checker' => $displayAs,
+                ];
+                
+                return;
+            }
+            
+            $result = [
+                'id_run' => $checker,
+                'id_should_run' => $firstly_assigned['usr_id'],
+                'checker' => $displayAs.' :: FOO',
+            ];
+EOD
+        );
+        $this->executor->execute($script, $variables);
+        $result = $variables->get('result');
+        self::assertIsArray($result);
+        self::assertEquals(2, $result['id_run']);
+    }
 }

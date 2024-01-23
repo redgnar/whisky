@@ -38,7 +38,6 @@ class BasicBuilder implements Builder
         foreach ($this->extensions as $extension) {
             $resultCode = $extension->build($resultCode, $parseResult);
         }
-        $resultCode .= ' return $return ?? null;';
 
         return $this->createScript(
             $code,
