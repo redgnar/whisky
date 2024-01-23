@@ -57,6 +57,11 @@ class VariableVisitor extends NodeVisitorAbstract
         return $this->returnValue;
     }
 
+    public function hasReturnValue(): bool
+    {
+        return $this->returnValue;
+    }
+
     public function isChildOfNode(Node $node, Node $child): bool
     {
         foreach ($node->getSubNodeNames() as $name) {
