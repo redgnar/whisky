@@ -98,7 +98,7 @@ class VariableVisitor extends NodeVisitorAbstract
             }
         } elseif ($node instanceof Arg && $node->value instanceof Variable && is_string($node->value->name)
             && !in_array($node->value->name, $this->loopVariables, true)) {
-            if (!in_array($node->value->name, $this->inputVariables, true)) {
+            if (!in_array($node->value->name, $this->inputVariables, true) && !in_array($node->value->name, $this->outputVaraibles, true)) {
                 $this->inputVariables[] = $node->value->name;
             }
             // Function can modify variable, so it should be added to output vars
@@ -172,9 +172,8 @@ class VariableVisitor extends NodeVisitorAbstract
                     $this->assignRightSide = null;
                 }
             }
-            $this->returnValue = true;
-
-            return new \PhpParser\Node\Stmt\Expression(new Assign(new Variable('return'), $node->expr ?? new Node\Expr\ConstFetch(new Name('null'))));
+            $this->returnValue = (bool) $node->expr;
+        // return new \PhpParser\Node\Stmt\Expression(new Assign(new Variable('return'), $node->expr ?? new Node\Expr\ConstFetch(new Name('null'))));
         } elseif ($node instanceof Node\Stmt\Foreach_ && !empty($this->loopVariables)) {
             if ($node->valueVar instanceof Variable && is_string(
                 $node->valueVar->name

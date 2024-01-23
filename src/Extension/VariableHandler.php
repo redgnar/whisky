@@ -42,8 +42,9 @@ class VariableHandler implements Extension
     {
         $preCode = $this->buildPreCode($inputVariables, $outputVariables);
         $postCode = $this->buildPostCode($outputVariables);
+        $newCode = $postCode ? preg_replace('/(\s*)return([\s\;])/', '${1}'.$postCode.'return${2}', $code) : $code;
 
-        return $preCode."\n".$code."\n".$postCode;
+        return $preCode."\n".$newCode."\n".$postCode;
     }
 
     /**
@@ -75,7 +76,7 @@ class VariableHandler implements Extension
         $postCode = '';
         if (!empty($outputVariables)) {
             foreach ($outputVariables as $variable) {
-                $postCode .= '$variables->set(\''.$variable.'\', $'.$variable.');';
+                $postCode .= 'if(isset($'.$variable.'))$variables->set(\''.$variable.'\', $'.$variable.');';
             }
         }
 

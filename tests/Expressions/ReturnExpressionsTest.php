@@ -42,7 +42,9 @@ class ReturnExpressionsTest extends TestCase
     {
         $variables = new BasicScope();
         $variables->set('test', 'test string');
-        $script = $this->builder->build('return ($test2 = $test);');
+        //Return value should be simple variable
+//        $script = $this->builder->build('return ($test2 = $test);');
+        $script = $this->builder->build('$test2 = $test;return $test2;');
         $result = $this->executor->execute($script, $variables);
         self::assertEquals($variables->get('test'), $result);
         self::assertEquals($variables->get('test'), $variables->get('test2'));

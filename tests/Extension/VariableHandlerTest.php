@@ -26,6 +26,6 @@ class VariableHandlerTest extends TestCase
         // Assert
         $this->assertSame('$inputVar=$variables->get(\'inputVar\');if($variables->has(\'outputVar\'))$outputVar=$variables->get(\'outputVar\');'."\n".
             'parsedCode'."\n".
-            '$variables->set(\'outputVar\', $outputVar);', $actual);
+            'if(isset($outputVar))$variables->set(\'outputVar\', $outputVar);', $actual);
     }
 }
