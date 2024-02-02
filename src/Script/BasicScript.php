@@ -10,11 +10,18 @@ class BasicScript implements Script
 {
     //    private Runtime $runTime;
 
+    private string $code;
+    private string $resultCode;
+    private ParseResult $parseResult;
+
     public function __construct(
-        private readonly string $code,
-        private readonly string $resultCode,
-        private readonly ParseResult $parseResult
+        string $code,
+        string $resultCode,
+        ParseResult $parseResult
     ) {
+        $this->code = $code;
+        $this->resultCode = $resultCode;
+        $this->parseResult = $parseResult;
     }
 
     public function getCode(): string

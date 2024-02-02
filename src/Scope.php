@@ -8,9 +8,15 @@ interface Scope
 {
     public function has(string $name): bool;
 
-    public function get(string $name): mixed;
+    /**
+     * @return mixed
+     */
+    public function get(string $name);
 
-    public function set(string $name, mixed $value): void;
+    /**
+     * @param mixed $value
+     */
+    public function set(string $name, $value): void;
 
     public function unset(string $name): void;
 }

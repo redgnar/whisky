@@ -3,7 +3,7 @@
 namespace Whisky\Executor;
 
 use Whisky\Executor;
-use Whisky\Function\FunctionRepository;
+use Whisky\Functions\FunctionRepository;
 use Whisky\InputError;
 use Whisky\RunError;
 use Whisky\Scope;
@@ -11,12 +11,18 @@ use Whisky\Script;
 
 class BasicExecutor implements Executor
 {
+    private FunctionRepository $functionRepository;
+
     public function __construct(
-        private readonly FunctionRepository $functionRepository
+        FunctionRepository $functionRepository
     ) {
+        $this->functionRepository = $functionRepository;
     }
 
-    public function execute(Script $script, Scope $variables): mixed
+    /**
+     * @return mixed
+     */
+    public function execute(Script $script, Scope $variables)
     {
         $notPassedVariables = [];
         foreach ($script->getParseResult()->getInputVariables() as $inputVariable) {
@@ -59,7 +65,7 @@ class BasicExecutor implements Executor
     protected function getCodeRunnerTemplate(): string
     {
         return <<<'EOD'
-return function(\Whisky\Scope $variables, \Whisky\Function\FunctionRepository $functions) {
+return function(\Whisky\Scope $variables, \Whisky\Functions\FunctionRepository $functions) {
 %s
 };
 EOD;

@@ -1,10 +1,10 @@
 <?php
 
-namespace Whisky\Test\Function;
+namespace Whisky\Test\Functions;
 
 use PHPUnit\Framework\TestCase;
-use Whisky\Function\FunctionRepository;
-use Whisky\Function\Provider;
+use Whisky\Functions\FunctionRepository;
+use Whisky\Functions\Provider;
 
 class FunctionRepositoryTest extends TestCase
 {

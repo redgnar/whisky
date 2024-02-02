@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Whisky\Function;
+namespace Whisky\Functions;
 
 /**
  * @extends \ArrayObject<string, \Closure>

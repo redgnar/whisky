@@ -13,6 +13,7 @@ return (new PhpCsFixer\Config())
         'multiline_whitespace_before_semicolons' => false,
         'no_unused_imports' => true,
         'no_useless_else' => true,
+        'no_superfluous_phpdoc_tags' => false,
         'protected_to_private' => false,
         'array_indentation' => true,
         'blank_line_between_import_groups' => false,

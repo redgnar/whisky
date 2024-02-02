@@ -14,12 +14,12 @@ class BasicScope extends \ArrayObject implements Scope
         return $this->offsetExists($name);
     }
 
-    public function get(string $name): mixed
+    public function get(string $name)
     {
         return $this->offsetGet($name);
     }
 
-    public function set(string $name, mixed $value): void
+    public function set(string $name, $value): void
     {
         $this->offsetSet($name, $value);
     }

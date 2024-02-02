@@ -6,5 +6,8 @@ namespace Whisky;
 
 interface Executor
 {
-    public function execute(Script $script, Scope $variables): mixed;
+    /**
+     * @return mixed
+     */
+    public function execute(Script $script, Scope $variables);
 }

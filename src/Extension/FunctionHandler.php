@@ -5,20 +5,22 @@ declare(strict_types=1);
 namespace Whisky\Extension;
 
 use Whisky\Extension;
-use Whisky\Function\FunctionRepository;
+use Whisky\Functions\FunctionRepository;
 use Whisky\Parser\ParseResult;
 
 class FunctionHandler implements Extension
 {
     use NotAllowedWord;
+    private FunctionRepository $functionRepository;
 
     private const NOT_ALLOWED_WORDS = [
         '$functions',
     ];
 
     public function __construct(
-        private readonly FunctionRepository $functionRepository
+        FunctionRepository $functionRepository
     ) {
+        $this->functionRepository = $functionRepository;
     }
 
     public function parse(string $code): string

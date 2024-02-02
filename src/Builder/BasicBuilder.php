@@ -13,16 +13,24 @@ use Whisky\Script\BasicScript;
 
 class BasicBuilder implements Builder
 {
+    private Parser $parser;
+    private Extension\VariableHandler $variableHandler;
+    private Extension\FunctionHandler $functionHandler;
+
     /**
      * @var Extension[]
      */
     private array $extensions = [];
 
     public function __construct(
-        private readonly Parser $parser,
-        private readonly Extension\VariableHandler $variableHandler,
-        private readonly Extension\FunctionHandler $functionHandler,
+        Parser $parser,
+        Extension\VariableHandler $variableHandler,
+        Extension\FunctionHandler $functionHandler
     ) {
+        $this->parser = $parser;
+        $this->variableHandler = $variableHandler;
+        $this->functionHandler = $functionHandler;
+
         $this->addExtension($this->variableHandler);
         $this->addExtension($this->functionHandler);
     }
