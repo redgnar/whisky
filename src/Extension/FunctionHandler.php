@@ -36,7 +36,7 @@ class FunctionHandler implements Extension
         foreach ($parseResult->getFunctionCalls() as $functionName) {
             if (!function_exists($functionName)) {
                 if ($this->functionRepository->has($functionName)) {
-                    $code = preg_replace('/(^|\W)'.str_replace(['$'], ['\$'], $functionName).'($|\W)/', '${1}$functions->get(\''.$functionName.'\')${2}', $code) ?? '';
+                    $code = preg_replace('/(^|[^\$\w])'.$functionName.'(\s*\()/', '${1}$functions->get(\''.$functionName.'\')${2}', $code) ?? '';
                 }
             }
         }
