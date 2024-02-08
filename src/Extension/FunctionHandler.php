@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Whisky\Extension;
 
 use Whisky\Extension;
-use Whisky\Function\FunctionRepository;
+use Whisky\Functions\FunctionRepository;
 use Whisky\Parser\ParseResult;
 
 class FunctionHandler implements Extension

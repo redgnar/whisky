@@ -3,7 +3,7 @@
 namespace Whisky\Executor;
 
 use Whisky\Executor;
-use Whisky\Function\FunctionRepository;
+use Whisky\Functions\FunctionRepository;
 use Whisky\InputError;
 use Whisky\RunError;
 use Whisky\Scope;

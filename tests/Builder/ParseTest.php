@@ -9,7 +9,7 @@ use Whisky\Builder\BasicBuilder;
 use Whisky\Extension\BasicSecurity;
 use Whisky\Extension\FunctionHandler;
 use Whisky\Extension\VariableHandler;
-use Whisky\Function\FunctionRepository;
+use Whisky\Functions\FunctionRepository;
 use Whisky\ParseError;
 use Whisky\Parser\PhpParser;
 use Whisky\Script;

@@ -11,7 +11,7 @@ use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
 use Whisky\Extension\FunctionHandler;
 use Whisky\Extension\VariableHandler;
-use Whisky\Function\FunctionRepository;
+use Whisky\Functions\FunctionRepository;
 use Whisky\Parser\PhpParser;
 use Whisky\RunError;
 use Whisky\Scope\BasicScope;
