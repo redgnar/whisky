@@ -59,7 +59,7 @@ class BasicExecutor implements Executor
     protected function getCodeRunnerTemplate(): string
     {
         return <<<'EOD'
-return function(\Whisky\Scope $variables, \Whisky\Function\FunctionRepository $functions) {
+return function(\Whisky\Scope $variables, \Whisky\Functions\FunctionRepository $functions) {
 %s
 };
 EOD;
