@@ -31,7 +31,7 @@ class BasicExecutor implements Executor
             }
         }
         if (!empty($notPassedVariables)) {
-            throw new InputError(sprintf('Script missing input variables: $1%s', implode(', ', $notPassedVariables)));
+            throw new InputError(sprintf('Script missing input variables: %1$s', implode(', ', $notPassedVariables)));
         }
 
         $executable = $this->compile($script);
