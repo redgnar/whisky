@@ -1,6 +1,8 @@
 ## []
 ### Fixed
--  Fix with error display of missing variables
+- Fix with error display of missing variables
+### Added
+- Allow using for and while
 
 ## 1.0.5 [22024-02-08]
 ### Fixed
