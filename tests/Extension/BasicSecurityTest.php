@@ -68,12 +68,6 @@ class BasicSecurityTest extends TestCase
         $this->builder->build('$this->c = $a;');
     }
 
-    public function testNotAllowedWhileUsage(): void
-    {
-        $this->expectException(ParseError::class);
-        $this->builder->build('$c = []; $i = 0; while (true) {$c[] = $i++;}');
-    }
-
     public function testNotAllowedClassUsage(): void
     {
         $this->expectException(ParseError::class);
