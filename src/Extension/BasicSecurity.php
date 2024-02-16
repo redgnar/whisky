@@ -13,7 +13,7 @@ class BasicSecurity implements Extension
     use NotAllowedWord;
 
     private const NOT_ALLOWED_WORDS = [
-        '$this', 'die', 'exit', 'for', 'while', 'do',
+        '$this', 'die', 'exit', 'do',
         'class', 'trait', 'abstract', 'include', 'include_once',
         'require', 'require_once', 'interface', 'public', 'private', 'protected',
         'new', 'namespace', 'use', 'define', 'const', 'declare', 'enddeclare',
