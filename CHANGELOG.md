@@ -1,10 +1,11 @@
-## []
+## 1.0.6 [2024-03-21]
 ### Fixed
 - Fix with error display of missing variables
+- Fix checking not allowed words in comments
 ### Added
 - Allow using for and while
 
-## 1.0.5 [22024-02-08]
+## 1.0.5 [2024-02-08]
 ### Fixed
 - Fix for custom function replacement
 
