@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Whisky\Extension;
 
 use Whisky\Extension;
-use Whisky\Function\FunctionRepository;
+use Whisky\Functions\FunctionRepository;
 use Whisky\Parser\ParseResult;
 
 class FunctionHandler implements Extension
@@ -23,7 +23,7 @@ class FunctionHandler implements Extension
 
     public function parse(string $code): string
     {
-        $codeWithoutStrings = $this->clearCodeFromStrings($code);
+        $codeWithoutStrings = $this->clearCodeFromStringsAndComments($code);
         foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
             $this->isWordAllowed($notAllowedWord, $codeWithoutStrings);
         }

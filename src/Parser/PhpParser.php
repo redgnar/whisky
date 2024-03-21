@@ -50,7 +50,7 @@ class PhpParser implements Parser
 
     protected function processCodeBeforeParse(string $code): string
     {
-        if (!str_contains($code, '<?php ')) {
+        if (!str_starts_with($code, '<?php')) {
             $code = '<?php '.$code;
         }
 

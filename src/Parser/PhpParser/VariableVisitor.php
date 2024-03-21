@@ -101,7 +101,7 @@ class VariableVisitor extends NodeVisitorAbstract
             if (!in_array($node->value->name, $this->inputVariables, true) && !in_array($node->value->name, $this->outputVaraibles, true)) {
                 $this->inputVariables[] = $node->value->name;
             }
-            // Function can modify variable, so it should be added to output vars
+            // Functions can modify variable, so it should be added to output vars
             if (!in_array($node->value->name, $this->outputVaraibles, true)) {
                 $this->outputVaraibles[] = $node->value->name;
             }

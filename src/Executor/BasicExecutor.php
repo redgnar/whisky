@@ -3,7 +3,7 @@
 namespace Whisky\Executor;
 
 use Whisky\Executor;
-use Whisky\Function\FunctionRepository;
+use Whisky\Functions\FunctionRepository;
 use Whisky\InputError;
 use Whisky\RunError;
 use Whisky\Scope;
@@ -25,7 +25,7 @@ class BasicExecutor implements Executor
             }
         }
         if (!empty($notPassedVariables)) {
-            throw new InputError(sprintf('Script missing input variables: $1%s', implode(', ', $notPassedVariables)));
+            throw new InputError(sprintf('Script missing input variables: %1$s', implode(', ', $notPassedVariables)));
         }
 
         $executable = $this->compile($script);
@@ -59,7 +59,7 @@ class BasicExecutor implements Executor
     protected function getCodeRunnerTemplate(): string
     {
         return <<<'EOD'
-return function(\Whisky\Scope $variables, \Whisky\Function\FunctionRepository $functions) {
+return function(\Whisky\Scope $variables, \Whisky\Functions\FunctionRepository $functions) {
 %s
 };
 EOD;

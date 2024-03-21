@@ -13,7 +13,7 @@ class BasicSecurity implements Extension
     use NotAllowedWord;
 
     private const NOT_ALLOWED_WORDS = [
-        '$this', 'die', 'exit', 'for', 'while', 'do',
+        '$this', 'die', 'exit', 'do',
         'class', 'trait', 'abstract', 'include', 'include_once',
         'require', 'require_once', 'interface', 'public', 'private', 'protected',
         'new', 'namespace', 'use', 'define', 'const', 'declare', 'enddeclare',
@@ -29,7 +29,7 @@ class BasicSecurity implements Extension
 
     public function parse(string $code): string
     {
-        $codeWithoutStrings = $this->clearCodeFromStrings($code);
+        $codeWithoutStrings = $this->clearCodeFromStringsAndComments($code);
         foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
             $this->isWordAllowed($notAllowedWord, $codeWithoutStrings);
         }

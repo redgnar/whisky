@@ -11,7 +11,7 @@ use Whisky\Executor\BasicExecutor;
 use Whisky\Extension\BasicSecurity;
 use Whisky\Extension\FunctionHandler;
 use Whisky\Extension\VariableHandler;
-use Whisky\Function\FunctionRepository;
+use Whisky\Functions\FunctionRepository;
 use Whisky\ParseError;
 use Whisky\Parser\ParseResult;
 use Whisky\Parser\PhpParser;
@@ -62,16 +62,31 @@ class BasicSecurityTest extends TestCase
         self::assertEquals('$a = 1;', $script->getCode());
     }
 
+    public function testOkUsageWithComments(): void
+    {
+        $script = $this->builder->build(<<<EOF
+// not while
+/**
+   not echo
+ */
+ # not function
+\$a = 1;
+EOF
+        );
+        self::assertEquals(<<<EOF
+// not while
+/**
+   not echo
+ */
+ # not function
+\$a = 1;
+EOF, $script->getCode());
+    }
+
     public function testNotAllowedThisUsage(): void
     {
         $this->expectException(ParseError::class);
         $this->builder->build('$this->c = $a;');
-    }
-
-    public function testNotAllowedWhileUsage(): void
-    {
-        $this->expectException(ParseError::class);
-        $this->builder->build('$c = []; $i = 0; while (true) {$c[] = $i++;}');
     }
 
     public function testNotAllowedClassUsage(): void
