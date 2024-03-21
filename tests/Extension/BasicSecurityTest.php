@@ -62,6 +62,27 @@ class BasicSecurityTest extends TestCase
         self::assertEquals('$a = 1;', $script->getCode());
     }
 
+    public function testOkUsageWithComments(): void
+    {
+        $script = $this->builder->build(<<<EOF
+// not while
+/**
+   not echo
+ */
+ # not function
+\$a = 1;
+EOF
+        );
+        self::assertEquals(<<<EOF
+// not while
+/**
+   not echo
+ */
+ # not function
+\$a = 1;
+EOF, $script->getCode());
+    }
+
     public function testNotAllowedThisUsage(): void
     {
         $this->expectException(ParseError::class);
