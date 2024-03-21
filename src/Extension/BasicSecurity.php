@@ -29,7 +29,7 @@ class BasicSecurity implements Extension
 
     public function parse(string $code): string
     {
-        $codeWithoutStrings = $this->clearCodeFromStrings($code);
+        $codeWithoutStrings = $this->clearCodeFromStringsAndComments($code);
         foreach (self::NOT_ALLOWED_WORDS as $notAllowedWord) {
             $this->isWordAllowed($notAllowedWord, $codeWithoutStrings);
         }
