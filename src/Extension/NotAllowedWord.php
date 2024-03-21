@@ -8,9 +8,14 @@ use Whisky\ParseError;
 
 trait NotAllowedWord
 {
-    private function clearCodeFromStrings(string $code): string
+    private function clearCodeFromStringsAndComments(string $code): string
     {
-        return preg_replace("/([\"'])(?:\\\\.|[^\\\\])*?\\1/", '""', $code) ?: '';
+        // Remove strings
+        $code = preg_replace("/([\"'])(?:\\\\.|[^\\\\])*?\\1/", '""', $code) ?: '';
+        // Remove comments
+        $code = preg_replace("~(?:#|//)[^\r\n]*|/\*.*?\*/~s", '', $code) ?: '';
+
+        return $code;
     }
 
     private function isWordAllowed(string $word, string $codeWithoutStrings): void
