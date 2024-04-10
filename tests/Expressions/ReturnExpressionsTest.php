@@ -66,4 +66,13 @@ class ReturnExpressionsTest extends TestCase
         $result = $this->executor->execute($script, $variables);
         self::assertEquals('Test', $result);
     }
+
+    public function testReturnWithVariable(): void
+    {
+        $variables = new BasicScope();
+        $script = $this->builder->build('$return = substr("Test Case", 0 , 4);return $return;');
+        $this->executor->execute($script, $variables);
+        $result = $this->executor->execute($script, $variables);
+        self::assertEquals('Test', $result);
+    }
 }
