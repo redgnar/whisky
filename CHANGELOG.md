@@ -1,3 +1,6 @@
+### Fixed
+- return special word in Variable Handler - using $return wasn't allowed
+
 ## 1.0.6 [2024-03-21]
 ### Fixed
 - Fix with error display of missing variables
